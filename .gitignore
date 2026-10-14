@@ -1,0 +1,14 @@
+# Node
+node_modules/
+.cache/
+dist/
+
+# Playwright outputs
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+.tmp/
+
+# Local environment (never commit secrets)
+.env

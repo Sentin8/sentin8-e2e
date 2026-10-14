@@ -1,0 +1,38 @@
+{
+  "name": "sentin8-platform-e2e-ts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sentin8 platform e2e — Admin UI (Dash) + CLI full-scenario coverage.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "playwright test --max-failures=1",
+    "test:cli": "playwright test tests/cli/",
+    "test:ui": "playwright test tests/ui/ --headed --max-failures=1",
+    "test:auth": "playwright test tests/cli/auth.spec.ts",
+    "test:sys": "playwright test tests/cli/sys.spec.ts",
+    "test:app": "playwright test tests/cli/app.spec.ts",
+    "test:storage": "playwright test tests/cli/storage.spec.ts",
+    "test:func": "playwright test tests/cli/func.spec.ts",
+    "test:cron": "playwright test tests/cli/cron.spec.ts",
+    "test:flow": "playwright test tests/cli/flow.spec.ts",
+    "test:bus": "playwright test tests/cli/bus.spec.ts",
+    "test:post": "playwright test tests/cli/post.spec.ts",
+    "test:stat": "playwright test tests/cli/stat.spec.ts",
+    "test:acme": "playwright test tests/cli/acme.spec.ts",
+    "test:db": "playwright test tests/cli/db.spec.ts",
+    "install-browsers": "playwright install chromium",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "pg": "^8.23.1",
+    "pnpm": "^12.3.4"
+  }
+}
