@@ -11,6 +11,8 @@
 // (the same file the fleet boots from) via fixtures/env.ts — no
 // hardcoded fallback (e2e DESIGN §4, invariant 5).
 import { platformDomain } from './env.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 /** Sentin8 platform root domain (from `SENTIN8_DOMAIN` — required). */
 export const DOMAIN = platformDomain();
@@ -44,8 +46,6 @@ export const URLs = {
 // other process (workers, CLI suites) reads the persisted value here.
 // Falling back to a generated value keeps direct single-process runs
 // (e.g. a lone spec executed manually) working.
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 let _runId: string | undefined;
 function loadPersistedRunId(): string | undefined {
@@ -99,7 +99,33 @@ export const Personas: Record<'admin', Persona> = {
 
 // ── CLI binary path ────────────────────────────────────────────────────
 
-/** Path to the built sentin8-cli binary. */
-export const CLI_BIN =
-  process.env.SENTIN8_CLI_BIN ??
-  '/home/hamid/dev/sentin8.new/sentin8/sentin8-cli/target/release/sentin8-cli';
+/**
+ * Path to the built sentin8-cli binary.
+ *
+ * Resolution order: an explicit `SENTIN8_CLI_BIN` → else derived from the
+ * tree root (`SENTIN8_REPO_ROOT`, already resolved by fixtures/env.ts):
+ * `{repo_root}/sentin8/sentin8-cli/target/{profile}/sentin8-cli`, where
+ * `profile` is `SENTIN8_CLI_PROFILE` (default `debug` — the documented dev
+ * pipeline builds debug) — with release tried as the fallback so a
+ * release-only tree works too. No operator-absolute paths: the suite must
+ * run on any checkout.
+ */
+function resolveCliBin(): string {
+  if (process.env.SENTIN8_CLI_BIN) return process.env.SENTIN8_CLI_BIN;
+  const repoRoot =
+    process.env.SENTIN8_REPO_ROOT ?? resolve(import.meta.dirname ?? '.', '..', '..', '..');
+  const profile = process.env.SENTIN8_CLI_PROFILE ?? 'debug';
+  const candidates = [
+    join(repoRoot, 'sentin8', 'sentin8-cli', 'target', profile, 'sentin8-cli'),
+    join(repoRoot, 'sentin8', 'sentin8-cli', 'target', 'release', 'sentin8-cli'),
+    join(repoRoot, 'sentin8', 'sentin8-cli', 'target', 'debug', 'sentin8-cli'),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  // Nothing built yet — return the primary candidate so the spawn error
+  // names the expected path (fail loud, not silently at a wrong absolute).
+  return candidates[0];
+}
+
+export const CLI_BIN = resolveCliBin();

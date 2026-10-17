@@ -24,7 +24,7 @@
 
 import { test, expect } from '@playwright/test';
 import { URLs } from '../../fixtures/testdata.js';
-import { cliCall, assertCliOk } from '../../fixtures/cli.js';
+import { cliCall, assertCliOk, jsonObj } from '../../fixtures/cli.js';
 import { ensureSignedIn, getTestEnvId, navigateToDashPage } from './_setup.js';
 import {
   rfwCreateViaForm, rfwVerifyInList, rfwRowAction, waitForFlutterContent,
@@ -60,15 +60,15 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
     const res = await assertCliOk(
       cliCall('post', 'GET', '/v1/admin/policy-sets', undefined, envId),
     );
-    const sets = Array.isArray(res.json) ? res.json : [];
+    const sets = (Array.isArray(res.json) ? res.json : []) as Array<Record<string, unknown>>;
     const mirror = sets.find(
-      (s: { policy_set_name?: string }) => s.policy_set_name === 'scope-mirror',
-    );
+      (s) => s.policy_set_name === 'scope-mirror',
+    ) as Record<string, unknown> | undefined;
     expect(mirror, 'scope-mirror set seeded by vertical init').toBeTruthy();
     // Decision 2026-09-07 (28.16): platform sets ship ENFORCED — step 5 is
     // the only gate; shadow remains the emergency rollback lever only.
-    expect(mirror.mode).toBe('enforced');
-    expect(mirror.origin).toBe('platform');
+    expect(mirror?.mode).toBe('enforced');
+    expect(mirror?.origin).toBe('platform');
   });
 
   test('tenant-authored set: PUT validates and stores in shadow', async () => {
@@ -83,8 +83,8 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         envId,
       ),
     );
-    expect(res.json.mode).toBe('shadow');
-    expect(res.json.origin === undefined || res.json.origin === 'tenant').toBeTruthy();
+    expect(jsonObj(res).mode).toBe('shadow');
+    expect(jsonObj(res).origin === undefined || jsonObj(res).origin === 'tenant').toBeTruthy();
   });
 
   test('PUT with invalid Shield text is rejected with 422 (write-time gate)', async () => {
@@ -116,7 +116,8 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         envId,
       ),
     );
-    expect(res.json.decision.decision).toBe('allow');
+    const decision = jsonObj(res).decision as Record<string, unknown>;
+    expect(decision.decision).toBe('allow');
   });
 
   test('enforce → shadow rollback flips mode via RFW alias', async () => {
@@ -124,20 +125,20 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
     const en = await assertCliOk(
       cliCall('post', 'POST', '/v1/admin/policy-sets/enforce', { policy_set_name: SET }, envId),
     );
-    expect(en.json.mode).toBe('enforced');
+    expect(jsonObj(en).mode).toBe('enforced');
     // Verify the list reflects it.
     const listed = await assertCliOk(
       cliCall('post', 'GET', '/v1/admin/policy-sets', undefined, envId),
     );
-    const row = (Array.isArray(listed.json) ? listed.json : []).find(
-      (s: { policy_set_name?: string }) => s.policy_set_name === SET,
-    );
+    const row = (Array.isArray(listed.json) ? listed.json : [] as unknown[]).find(
+      (s) => (s as Record<string, unknown>).policy_set_name === SET,
+    ) as Record<string, unknown> | undefined;
     expect(row?.mode).toBe('enforced');
     // Rollback = one UPDATE (data change, not a deploy — design §4.1).
     const sh = await assertCliOk(
       cliCall('post', 'POST', '/v1/admin/policy-sets/shadow', { policy_set_name: SET }, envId),
     );
-    expect(sh.json.mode).toBe('shadow');
+    expect(jsonObj(sh).mode).toBe('shadow');
   });
 
   test('DELETE removes the tenant set (platform rows are protected)', async () => {
@@ -148,7 +149,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
       cliCall('post', 'GET', '/v1/admin/policy-sets', undefined, envId),
     );
     const row = (Array.isArray(listed.json) ? listed.json : []).find(
-      (s: { policy_set_name?: string }) => s.policy_set_name === SET,
+      (s) => (s as Record<string, unknown>).policy_set_name === SET,
     );
     expect(row, 'tenant set deleted').toBeUndefined();
     // Platform row protection: DELETE on the seeded platform set must 404.
@@ -180,14 +181,14 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         envId,
       ),
     );
-    expect(put.json.status).toBe('upserted');
+    expect(jsonObj(put).status).toBe('upserted');
     // Listed.
     const listed = await assertCliOk(
       cliCall('post', 'GET', '/v1/admin/relations', undefined, envId),
     );
-    const row = (Array.isArray(listed.json) ? listed.json : []).find(
-      (r: { subject_id?: string }) => r.subject_id === SUBJECT,
-    );
+    const row = (Array.isArray(listed.json) ? listed.json : [] as unknown[]).find(
+      (r) => (r as Record<string, unknown>).subject_id === SUBJECT,
+    ) as Record<string, unknown> | undefined;
     expect(row, 'relation tuple listed').toBeTruthy();
     expect(row?.relation).toBe('member');
     // Dry-run check: connected (direct).
@@ -200,8 +201,8 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         envId,
       ),
     );
-    expect(check.json.direct).toBe(true);
-    expect(check.json.connected).toBe(true);
+    expect(jsonObj(check).direct).toBe(true);
+    expect(jsonObj(check).connected).toBe(true);
     // DELETE → gone from the list.
     await assertCliOk(
       cliCall(
@@ -217,7 +218,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
     );
     expect(
       (Array.isArray(after.json) ? after.json : []).find(
-        (r: { subject_id?: string }) => r.subject_id === SUBJECT,
+        (r) => (r as Record<string, unknown>).subject_id === SUBJECT,
       ),
     ).toBeUndefined();
   });
@@ -253,9 +254,9 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         envId,
       ),
     );
-    const row = (Array.isArray(listed.json) ? listed.json : []).find(
-      (a: { attr_key?: string }) => a.attr_key === 'dept',
-    );
+    const row = (Array.isArray(listed.json) ? listed.json : [] as unknown[]).find(
+      (a) => (a as Record<string, unknown>).attr_key === 'dept',
+    ) as Record<string, unknown> | undefined;
     expect(row, 'attribute listed').toBeTruthy();
     expect(row?.attr_value).toContain('engineering');
     // DELETE.

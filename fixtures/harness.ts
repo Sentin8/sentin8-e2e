@@ -3514,7 +3514,10 @@ export async function rfwRowAction(
     }
     if (!best) return null;
     // Within the smallest card's subtree, find the action button.
-    for (const btn of best.querySelectorAll('flt-semantics')) {
+    // (Array.from: NodeListOf predates the DOM.Iterable iteration
+    // protocols this tsconfig's lib set targets — an explicit spread
+    // keeps the for-of valid under every lib combination.)
+    for (const btn of Array.from(best.querySelectorAll('flt-semantics'))) {
       const bt = `${btn.textContent ?? ''} ${btn.getAttribute('aria-label') ?? ''}`.trim().toLowerCase();
       if (bt !== a || btn.getAttribute('role') !== 'button') continue;
       const r0 = (btn as HTMLElement).getBoundingClientRect();

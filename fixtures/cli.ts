@@ -35,6 +35,26 @@ export interface CliResult {
   cmdLine: string;
 }
 
+/**
+ * A parsed-JSON record view of a `CliResult.json` for property access in
+ * specs: the CLI's JSON body is service-defined and untyped at the
+ * fixture layer, so the specs that read fields cast through this shape.
+ * `null` for non-object bodies (the caller's expectation then fails
+ * loudly at the property read, naming the real body shape).
+ */
+export type CliJson = Record<string, unknown>;
+
+/**
+ * Typed record view of a CLI result's JSON body (throws on absent JSON —
+ * a spec reading fields means the call was expected to return an object).
+ */
+export function jsonObj(r: CliResult): CliJson {
+  if (r.json && typeof r.json === 'object' && !Array.isArray(r.json)) {
+    return r.json as CliJson;
+  }
+  throw new Error(`expected a JSON object body, got: ${r.stdout.slice(0, 200)}`);
+}
+
 // ── Core runner ────────────────────────────────────────────────────────
 
 /**

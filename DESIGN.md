@@ -58,6 +58,14 @@ graph TD
    domain default is a defect: URLs are DERIVED, never assumed, and a
    missing `SENTIN8_DOMAIN` (nothing to derive from, nothing to guess)
    fails the run at configuration load — never mid-test.
+6. **The CLI binary path derives from the tree, not the operator's
+   machine** — `fixtures/testdata.ts` resolves `CLI_BIN` as
+   `SENTIN8_CLI_BIN` (explicit override) → else the first existing of
+   `{repo_root}/sentin8/sentin8-cli/target/{SENTIN8_CLI_PROFILE:-debug|release|debug}/sentin8-cli`
+   (repo root from `SENTIN8_REPO_ROOT`, the same resolution as
+   invariant 5). A hard-coded operator-absolute path is the same defect
+   class as a hard-coded domain: it dies with `spawn ENOENT` on any other
+   checkout or profile.
 
 ## 5. Testing Strategy (of this repo)
 

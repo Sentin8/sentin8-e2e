@@ -19,7 +19,7 @@
 
 import { test, expect } from '@playwright/test';
 import { URLs } from '../../fixtures/testdata.js';
-import { cliCall, assertCliOk } from '../../fixtures/cli.js';
+import { cliCall, assertCliOk, jsonObj } from '../../fixtures/cli.js';
 import { ensureSignedIn, getTestEnvId } from './_setup.js';
 import type { BrowserContext, Page } from '@playwright/test';
 
@@ -58,8 +58,8 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
         origin: 'tenant',
       }, envId),
     );
-    expect(res.json.version).toBe(1);
-    expect(res.json.origin).toBe('tenant');
+    expect(jsonObj(res).version).toBe(1);
+    expect(jsonObj(res).origin).toBe('tenant');
   });
 
   test('prompt versions are immutable — duplicate (name, version) is 409', async () => {
@@ -108,7 +108,7 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
       top_k: 5,
     }, envId);
     if (res.exitCode === 0) {
-      expect(res.json.chunks).toEqual([]);
+      expect((jsonObj(res).chunks as unknown[])).toEqual([]);
     } else {
       expect(
         res.stderr.includes('no embedding provider configured') ||
@@ -122,11 +122,11 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
     const res = await assertCliOk(
       cliCall('ai', 'GET', '/v1/providers', undefined, envId),
     );
-    const providers = Array.isArray(res.json) ? res.json : [];
+    const providers = (Array.isArray(res.json) ? res.json : []) as Array<Record<string, unknown>>;
     for (const p of providers) {
       expect(p.credential_ref).toBeTruthy();
       // Never a plaintext credential — refs only.
-      expect(p.credential_ref.startsWith('ref:'), 'credential must be a reference').toBeTruthy();
+      expect((p.credential_ref as string).startsWith('ref:'), 'credential must be a reference').toBeTruthy();
     }
   });
 
@@ -134,6 +134,6 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
     const res = await assertCliOk(
       cliCall('ai', 'GET', '/v1/admin/ui/prompts', undefined, envId),
     );
-    expect(res.json.response_type).toBe('page');
+    expect(jsonObj(res).response_type).toBe('page');
   });
 });
