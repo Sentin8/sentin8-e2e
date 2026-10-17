@@ -1,4 +1,4 @@
-# DESIGN.md: sentin8-e2e — Detailed Design Document
+# sentin8-e2e — Detailed Design Document
 
 > Wire-level construction of the platform's E2E suite. Overview in
 > `README.md`; the business framing in `BUSINESS.md`.

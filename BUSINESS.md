@@ -1,4 +1,4 @@
-# BUSINESS.md: sentin8-e2e — Business Requirements & Functionality
+# sentin8-e2e — Business Requirements & Functionality
 
 > Audience: product owners, business analysts, and anyone evaluating what
 > sentin8-e2e **does for the business**. For the overview read `README.md`;
