@@ -3,13 +3,13 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/_setup.ts — shared setup for Dash UI suites.
+// tests/ui/_setup.ts - shared setup for Dash UI suites.
 //
 // The global setup (global-setup.ts) runs ONCE before all test files:
 // signs in, creates org + env, saves browser storage state.
 // This file reads the org/env IDs from the saved meta file.
 // Each test file creates its own browser context but reuses the
-// storage state (cookies) — no sign-in needed.
+// storage state (cookies) - no sign-in needed.
 
 // Allow self-signed certs for local dev.
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -38,7 +38,7 @@ function loadMeta(): void {
   }
 }
 
-/** Ensure the CLI is signed in (idempotent — skips if already done). */
+/** Ensure the CLI is signed in (idempotent - skips if already done). */
 let _cliSignedIn = false;
 export async function ensureSignedIn(
   _page: Page,
@@ -125,8 +125,8 @@ export async function navigateToDashPage(
     })];
     // When the service label equals the leaf label (e.g. sentin8-secrets
     // service label "Secrets" + page route "secrets" → leaf "Secrets") the
-    // leaf click resolves to the FIRST matching button — the service parent
-    // — which navigates to the service's first page (overview), not the
+    // leaf click resolves to the FIRST matching button - the service parent
+    // - which navigates to the service's first page (overview), not the
     // requested page. Route such collisions through the direct-URL fallback
     // below instead of the sidebar.
     if (
@@ -137,18 +137,18 @@ export async function navigateToDashPage(
     }
   }
   if (sidebarPath.length === 0) {
-    throw new Error('sidebar-path collision — use direct URL navigation');
+    throw new Error('sidebar-path collision - use direct URL navigation');
   }
 
   try {
-    // Navigate via sidebar — the human way.
+    // Navigate via sidebar - the human way.
     await navigateViaSidebar(page, sidebarPath);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
   } catch {
     // Fallback: direct URL navigation if sidebar isn't available.
     // Sys native pages (home/settings/audit/branding) live at TOP-LEVEL
-    // hash paths (#/audit, not #/sys/audit — the dash main.dart treats
+    // hash paths (#/audit, not #/sys/audit - the dash main.dart treats
     // single-segment routes as native pages; #/sys/audit falls into the
     // RFW catch-all where sys has no admin UI and 404s).
     const params = new URLSearchParams();

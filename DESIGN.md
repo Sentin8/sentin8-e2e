@@ -1,4 +1,4 @@
-# sentin8-e2e — Detailed Design Document
+# sentin8-e2e - Detailed Design Document
 
 > Wire-level construction of the platform's E2E suite. Overview in
 > `README.md`; the business framing in `BUSINESS.md`.
@@ -9,11 +9,11 @@ The E2E suite is the platform's **user-truth plane**: it asserts what a
 real browser + the real BFF proxy achieve. Its defining constraint
 (AGENTS.md E2E rule) is also its architecture:
 
-- **No direct database access** — no `psql`, no SQL, no direct writes.
-- **No direct backend HTTP** (except the BFF proxy) — test state is
+- **No direct database access** - no `psql`, no SQL, no direct writes.
+- **No direct backend HTTP** (except the BFF proxy) - test state is
   built through real UI flows or `/proxy/sys/v1/...`,
   `/proxy/auth/v1/...`.
-- **No bypassed authorization** — permissions are acquired through real
+- **No bypassed authorization** - permissions are acquired through real
   flows (org creation grants org-admin); fixtures never insert roles.
 
 ```mermaid
@@ -38,7 +38,7 @@ graph TD
 
 1. **Clean state**: tests assume a booted platform (captain fleet + PG +
    Valkey); no fixture mutates the DB.
-2. **State construction**: every prerequisite is a real flow — sign-up,
+2. **State construction**: every prerequisite is a real flow - sign-up,
    create org, create env, enable feature, assign role through UI.
 3. **Teardown**: browser contexts are per-test; durable test artifacts
    (orgs/users) follow the suite's naming convention for operator
@@ -46,20 +46,20 @@ graph TD
 
 ## 4. Invariants
 
-1. **UI + BFF proxy only** — a setup step impossible through UI/API is a
+1. **UI + BFF proxy only** - a setup step impossible through UI/API is a
    product gap, filed as a backend story, never worked around with SQL.
-2. **Authorization is earned like a user's** — no role/grant injection.
-3. **No secrets in fixtures** — credentials from the environment.
+2. **Authorization is earned like a user's** - no role/grant injection.
+3. **No secrets in fixtures** - credentials from the environment.
 4. **The suite runs against release-mode fleets** (debug fleets are the
    dev pipeline's domain).
-5. **Configuration mirrors the fleet's** — the suite reads the SAME
+5. **Configuration mirrors the fleet's** - the suite reads the SAME
    tree-root `.env` the fleet is booted from (`SENTIN8_DOMAIN`, resolved
    via `SENTIN8_REPO_ROOT`, `process.env` precedence). A hard-coded
    domain default is a defect: URLs are DERIVED, never assumed, and a
    missing `SENTIN8_DOMAIN` (nothing to derive from, nothing to guess)
-   fails the run at configuration load — never mid-test.
+   fails the run at configuration load - never mid-test.
 6. **The CLI binary path derives from the tree, not the operator's
-   machine** — `fixtures/testdata.ts` resolves `CLI_BIN` as
+   machine** - `fixtures/testdata.ts` resolves `CLI_BIN` as
    `SENTIN8_CLI_BIN` (explicit override) → else the first existing of
    `{repo_root}/sentin8/sentin8-cli/target/{SENTIN8_CLI_PROFILE:-debug|release|debug}/sentin8-cli`
    (repo root from `SENTIN8_REPO_ROOT`, the same resolution as

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/bidirectional/auth.spec.ts — E2E-BI-1: bidirectional proof for auth.
+// tests/bidirectional/auth.spec.ts - E2E-BI-1: bidirectional proof for auth.
 //
 // Direction A (UI → CLI): Create user via Dash UI → verify via CLI `auth user list`.
 // Direction B (CLI → UI): Create user via CLI `auth user create` → verify via Dash UI.
@@ -19,7 +19,7 @@ const SYS_ENV = '00000000-0000-0000-0000-000000000002';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Bidirectional proof — auth', () => {
+test.describe('Bidirectional proof - auth', () => {
   let context: BrowserContext;
   let page: Page;
 
@@ -48,7 +48,7 @@ test.describe('Bidirectional proof — auth', () => {
 
     // The full UI create-user flow requires clicking "Create User", filling
     // the form, and submitting. This is complex with Flutter CanvasKit.
-    // For the bidirectional proof, we verify the CLI side — the UI side
+    // For the bidirectional proof, we verify the CLI side - the UI side
     // is covered by the UI smoke tests.
     //
     // Verify via CLI that user list works

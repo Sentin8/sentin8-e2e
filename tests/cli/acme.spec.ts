@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/acme.spec.ts — E2E-CLI-13: acme CLI suite — full functional E2E.
+// tests/cli/acme.spec.ts - E2E-CLI-13: acme CLI suite - full functional E2E.
 //
 // Full lifecycle: fetch root CA cert → verify PEM → fetch intermediate CA cert
 // → verify PEM → verify root cert matches the local trust store.
@@ -15,7 +15,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-test.describe('CLI — acme (full functional)', () => {
+test.describe('CLI - acme (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('acme commands are listed in list-commands', async () => {
@@ -24,20 +24,20 @@ test.describe('CLI — acme (full functional)', () => {
     expect(r.stdout).toContain('acme:');
   });
 
-  test('acme ca root — fetch and verify root CA cert', async () => {
+  test('acme ca root - fetch and verify root CA cert', async () => {
     const r = await cliDo('acme', 'ca', 'root');
     if (r.exitCode !== 0) {
-      test.skip(true, 'acme service not reachable via proxy — skipping');
+      test.skip(true, 'acme service not reachable via proxy - skipping');
       return;
     }
     expect(r.stdout).toContain('-----BEGIN CERTIFICATE-----');
     expect(r.stdout).toContain('-----END CERTIFICATE-----');
   });
 
-  test('acme ca intermediate — fetch and verify intermediate CA cert', async () => {
+  test('acme ca intermediate - fetch and verify intermediate CA cert', async () => {
     const r = await cliDo('acme', 'ca', 'intermediate');
     if (r.exitCode !== 0) {
-      test.skip(true, 'acme service not reachable via proxy — skipping');
+      test.skip(true, 'acme service not reachable via proxy - skipping');
       return;
     }
     expect(r.stdout).toContain('-----BEGIN CERTIFICATE-----');
@@ -50,7 +50,7 @@ test.describe('CLI — acme (full functional)', () => {
     try {
       localCert = await readFile(caPath, 'utf-8');
     } catch {
-      test.skip(true, 'local root CA file not found — skipping');
+      test.skip(true, 'local root CA file not found - skipping');
       return;
     }
     expect(localCert).toContain('-----BEGIN CERTIFICATE-----');

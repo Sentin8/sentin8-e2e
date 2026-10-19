@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/auth.spec.ts — E2E-CLI-3: auth CLI suite — full functional E2E.
+// tests/cli/auth.spec.ts - E2E-CLI-3: auth CLI suite - full functional E2E.
 //
 // Full lifecycle: user create→get→archive, role create→get→delete,
 // group create→get→delete, api-key create→revoke, application register→list,
@@ -16,7 +16,7 @@ import { RUN_ID, URLs } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — auth (full functional)', () => {
+test.describe('CLI - auth (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('auth commands are listed in list-commands', async () => {
@@ -129,10 +129,10 @@ test.describe('CLI — auth (full functional)', () => {
     assertCliDispatched(r4, 'auth connection list');
   });
 
-  // ── 25.3.5 — CLI signup creates user → verify via `auth user list` → cleanup ──
-  test('auth signup — CLI signup creates user, verify in list, cleanup', async () => {
+  // ── 25.3.5 - CLI signup creates user → verify via `auth user list` → cleanup ──
+  test('auth signup - CLI signup creates user, verify in list, cleanup', async () => {
     const email = `e2e-signup-${RUN_ID}@a.co`;
-    // CLI signup (unauthenticated surface — creates the user).
+    // CLI signup (unauthenticated surface - creates the user).
     const r1 = await runCli([
       'signup',
       '--sentin8-auth-url', URLs.auth,

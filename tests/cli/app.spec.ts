@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/app.spec.ts — E2E-CLI-5: app CLI suite — full functional E2E.
+// tests/cli/app.spec.ts - E2E-CLI-5: app CLI suite - full functional E2E.
 //
 // Full lifecycle: listing create → list → get → archive.
 // Also: instance get (non-existent → error).
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — app (full functional)', () => {
+test.describe('CLI - app (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('app commands are listed in list-commands', async () => {

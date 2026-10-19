@@ -3,19 +3,19 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/strictpage.ts — console-error / HTTP-error assertions for UI tests.
+// fixtures/strictpage.ts - console-error / HTTP-error assertions for UI tests.
 //
 // StrictPage records console errors and HTTP ≥ 400 responses during
-// browser interactions. assertNoFailures() fails on ANY error — no silent
+// browser interactions. assertNoFailures() fails on ANY error - no silent
 // ignores, no filtering, no exceptions. FAIL FAST.
 
 export class StrictPage {
   private consoleErrors: string[] = [];
   private httpErrors: string[] = [];
-  /** Structured view of httpErrors (parallel array) — carries the method so
+  /** Structured view of httpErrors (parallel array) - carries the method so
    *  superseded-retry detection can match requests precisely. */
   private httpFailureDetails: Array<{ method: string; path: string; status: number }> = [];
-  /** All API responses (method, path, status) in arrival order — used to
+  /** All API responses (method, path, status) in arrival order - used to
    *  detect transient retries: a 4xx superseded by a later 2xx/3xx for the
    *  same method+path is a retry artifact, not a real failure. */
   private allResponses: Array<{ method: string; path: string; status: number }> = [];
@@ -50,7 +50,7 @@ export class StrictPage {
 
   /** True when a 4xx/5xx entry was followed by a 2xx/3xx for the same
    *  method+path (the client retried and the retry succeeded). Matches by
-   *  value, not reference — so constructed descriptors work too. */
+   *  value, not reference - so constructed descriptors work too. */
   private isSuperseded(entry: { method: string; path: string; status: number }): boolean {
     // Find the LAST occurrence of this exact (method, path, status).
     let lastIdx = -1;
@@ -75,7 +75,7 @@ export class StrictPage {
   assertNoFailures(): void {
     // Parse the console error text to correlate with tracked responses
     // ("Failed to load resource: the server responded with a status of 400
-    // (Bad Request)") — the console message carries no URL, so instead of
+    // (Bad Request)") - the console message carries no URL, so instead of
     // correlating we check whether ANY console error corresponds to an
     // HTTP error that was superseded by a successful retry. Console
     // messages and HTTP errors are recorded in the same order for

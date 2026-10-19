@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/post.spec.ts — E2E-UI-14: post UI suite — full functional.
+// tests/ui/post.spec.ts - E2E-UI-14: post UI suite - full functional.
 //
 // Full lifecycle: messages → list; gateways → list; dlq → list.
 
@@ -16,7 +16,7 @@ import { cliDo, cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — post (full functional)', () => {
+test.describe('UI - post (full functional)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
   test.beforeAll(async ({ browser }) => {
@@ -29,7 +29,7 @@ test.describe('UI — post (full functional)', () => {
   });
   test.afterAll(async () => { await context?.close(); });
 
-  test('post/messages — list messages', async () => {
+  test('post/messages - list messages', async () => {
     await navigateToDashPage(page, 'post', 'messages', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -41,7 +41,7 @@ test.describe('UI — post (full functional)', () => {
     assertCliOk(r, 'post messages (CLI verify)');
   });
 
-  test('post/gateways — list gateways', async () => {
+  test('post/gateways - list gateways', async () => {
     await navigateToDashPage(page, 'post', 'gateways', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -53,7 +53,7 @@ test.describe('UI — post (full functional)', () => {
     assertCliOk(r, 'post gateways (CLI verify)');
   });
 
-  test('post/dlq — list dead-lettered messages', async () => {
+  test('post/dlq - list dead-lettered messages', async () => {
     await navigateToDashPage(page, 'post', 'dlq', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -69,7 +69,7 @@ test.describe('UI — post (full functional)', () => {
   // Phase 3: Full functional CRUD test (E2E-UI-Full-12)
   // ════════════════════════════════════════════════════════════════════
 
-  test('post/gateways — create gateway, verify in UI + CLI', async () => {
+  test('post/gateways - create gateway, verify in UI + CLI', async () => {
     const provider = `e2e-smtp-${RUN_ID}`;
     const gatewaysUrl = `${URLs.dash}/#/sentin8-post/gateways?env=${envId}`;
 

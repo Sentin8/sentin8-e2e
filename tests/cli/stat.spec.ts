@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/stat.spec.ts — E2E-CLI-12: stat CLI suite — full functional E2E.
+// tests/cli/stat.spec.ts - E2E-CLI-12: stat CLI suite - full functional E2E.
 //
 // Full lifecycle: property create → list → get → update → delete.
 // Also: account create → list.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — stat (full functional)', () => {
+test.describe('CLI - stat (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('stat commands are listed in list-commands', async () => {

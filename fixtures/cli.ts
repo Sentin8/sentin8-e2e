@@ -3,12 +3,12 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/cli.ts — sentin8-cli subprocess runner + output parser.
+// fixtures/cli.ts - sentin8-cli subprocess runner + output parser.
 //
 // Story E2E-CLI-1: Spawns the sentin8-cli binary as a real subprocess,
 // captures stdout/stderr, parses JSON/table output. This exercises the
 // actual binary, its token storage (~/.sentin8/credentials), and its
-// delegation path — not a re-implementation of the executor.
+// delegation path - not a re-implementation of the executor.
 //
 // Story E2E-CLI-2: Headless device-flow sign-in. The CLI's RFC 8628
 // Device Flow is completed by reading the user_code from stdout and
@@ -45,7 +45,7 @@ export interface CliResult {
 export type CliJson = Record<string, unknown>;
 
 /**
- * Typed record view of a CLI result's JSON body (throws on absent JSON —
+ * Typed record view of a CLI result's JSON body (throws on absent JSON -
  * a spec reading fields means the call was expected to return an object).
  */
 export function jsonObj(r: CliResult): CliJson {
@@ -95,7 +95,7 @@ export async function runCli(
       };
       // Try to parse JSON if the output looks like JSON.
       // The CLI may print a version banner line ("sentin8-cli v0.1.0 …")
-      // before the JSON body — strip everything before the first '{' or
+      // before the JSON body - strip everything before the first '{' or
       // '[' so result.json is populated. Without this, extractId falls
       // back to the first-UUID-in-text regex, which can match an
       // unrelated field (e.g. created_by) that happens to sort before id.
@@ -110,7 +110,7 @@ export async function runCli(
         try {
           result.json = JSON.parse(trimmed);
         } catch {
-          // not JSON — leave json undefined
+          // not JSON - leave json undefined
         }
       }
       resolve(result);
@@ -184,7 +184,7 @@ export async function cliWhoami(): Promise<CliResult> {
 /**
  * Force a token refresh by calling the auth refresh endpoint directly.
  * This is needed after the user gains new roles (e.g. env:admin after
- * creating an env) — the stored access token is still valid but carries
+ * creating an env) - the stored access token is still valid but carries
  * the old (pre-env-creation) scope set. A refresh re-computes role scopes
  * server-side via fetch_role_scopes and returns an updated token.
  */
@@ -236,7 +236,7 @@ export async function cliRefreshToken(): Promise<void> {
  * Sign in the CLI using OAuth 2.0 Device Authorization Grant (RFC 8628).
  *
  * Implements the full device flow:
- *   1. CLI signup — `sentin8-cli signup --email --password` creates the user.
+ *   1. CLI signup - `sentin8-cli signup --email --password` creates the user.
  *   2. POST /oauth/device to get a device_code + user_code + verification_uri.
  *   3. Open a browser to the verification_uri, sign in via the auth sign-in
  *      page (fill email + password, click Continue), then approve the device.
@@ -260,12 +260,12 @@ export async function cliSignIn(
       if (whoEmail === email && whoScopes.length > 0) {
         return; // Already signed in as the right user with scopes.
       }
-      // Wrong user or no scopes — sign out first, then re-sign in.
+      // Wrong user or no scopes - sign out first, then re-sign in.
       logStep(`[step] cliSignIn: re-signing in (was ${whoEmail || 'unknown'}, need ${email})`);
       await runCli(['signout']);
     }
   } catch {
-    // not signed in — proceed
+    // not signed in - proceed
   }
 
   // Disable TLS verification for the local self-signed CA
@@ -273,7 +273,7 @@ export async function cliSignIn(
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   try {
-    // Step 1: Sign up the user via CLI (idempotent — OK if already exists).
+    // Step 1: Sign up the user via CLI (idempotent - OK if already exists).
     const signupResult = await runCli([
       'signup', '--email', email, '--password', password,
       '--first-name', 'Test', '--last-name', 'Operator',
@@ -281,7 +281,7 @@ export async function cliSignIn(
     // exit 0 = created, non-zero = already exists (both are OK).
 
     // Step 2-5: Browser-assisted device flow.
-    // Clear auth rate limits first — the device flow browser sign-in
+    // Clear auth rate limits first - the device flow browser sign-in
     // counts against the rate limiter.
     clearAuthRateLimits(email);
     await deviceFlowSignIn(email, password);
@@ -297,7 +297,7 @@ export async function cliSignIn(
 /** Full device-flow: request code → browser sign-in + approve → poll → write credentials. */
 async function deviceFlowSignIn(email: string, password: string): Promise<void> {
   // Collect all scopes from the registry so the token covers every
-  // service command — no command gets a 403 for missing scopes.
+  // service command - no command gets a 403 for missing scopes.
   const scope = await loadAllScopes();
 
   // 1. Request device code
@@ -327,7 +327,7 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
   // 2. Approve the device code via browser sign-in
   await approveDeviceViaBrowser(deviceData.verification_uri_complete, email, password);
 
-  // 3. Poll for the token — poll immediately, then every 1 second.
+  // 3. Poll for the token - poll immediately, then every 1 second.
   const startTime = Date.now();
   const maxWait = (deviceData.expires_in ?? 900) * 1000;
   const pollInterval = 1000; // 1 second (faster than server's suggested 5s)
@@ -353,14 +353,14 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
       error?: string;
     };
 
-    // RFC 8628 §3.5 — only `authorization_pending` and `slow_down` mean
+    // RFC 8628 §3.5 - only `authorization_pending` and `slow_down` mean
     // "keep polling". Any other error is terminal: fail fast (with the
     // server's error_description when present) instead of looping to the
     // 15-minute device-code expiry.
     const POLLABLE = new Set(['authorization_pending', 'slow_down']);
     if (tokenData.error && !POLLABLE.has(tokenData.error)) {
       const desc = (tokenData as { error_description?: string }).error_description ?? '';
-      throw new Error(`Device token poll failed: ${tokenData.error}${desc ? ` — ${desc}` : ''}`);
+      throw new Error(`Device token poll failed: ${tokenData.error}${desc ? ` - ${desc}` : ''}`);
     }
 
     if (tokenData.access_token) {
@@ -408,7 +408,7 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
 
 /**
  * Approve a device code by opening a browser, signing in via the auth
- * sign-in page, and approving the device code — exactly like a real user.
+ * sign-in page, and approving the device code - exactly like a real user.
  * Falls back to direct API approval if the browser flow can't complete.
  */
 async function approveDeviceViaBrowser(
@@ -473,11 +473,11 @@ async function approveDeviceViaBrowser(
   }
 
   // Fallback: if browser didn't find an approval button, approve via API.
-  // SEC-2.1.4 — device verification requires a session; the approving
+  // SEC-2.1.4 - device verification requires a session; the approving
   // user comes from the session token, not the request body.
   if (!approved && userCode) {
     // The hostname header routes the request through the ingress; it is
-    // DERIVED from the suite's domain (never a hardcoded literal — e2e
+    // DERIVED from the suite's domain (never a hardcoded literal - e2e
     // DESIGN §4 invariant 5).
     const authHost = `auth.ops.sys.${DOMAIN}`;
     const signInResp = await fetch(`${URLs.auth}/v1/sign-in`, {
@@ -519,7 +519,7 @@ export async function loadWasmFixture(name: string = 'minimal.wasm'): Promise<st
 /**
  * Build a DISTINCT wasm binary from a base fixture by appending an empty
  * custom section carrying the given tag. Custom sections are ignorable,
- * so the module stays valid for the func validator — but its content
+ * so the module stays valid for the func validator - but its content
  * hash differs, which the content-addressed module registry (func
  * DESIGN §3: same (env, domain, product, hash) re-registers the existing
  * version) needs to treat v2/v3 as NEW versions.
@@ -592,7 +592,7 @@ function cliFailureError(r: CliResult, context?: string, expected?: string): Err
  * result (so the awaited form can read `.json`).
  *
  * Contract (E2E-BI-12, 2026-09-23): when called with an ALREADY-RESOLVED
- * `CliResult` the failure throws SYNCHRONOUSLY — no promise escapes the
+ * `CliResult` the failure throws SYNCHRONOUSLY - no promise escapes the
  * test body. The helpers are `async` (to support the
  * `await assertCliOk(cliCall(…))` shape) and the specs historically called
  * them un-awaited with resolved inputs: a rejected promise then propagated
@@ -609,19 +609,19 @@ export async function assertCliOk(
 ): Promise<CliResult> {
   if (result instanceof Promise) {
     const r = await result;
-    logStep(`[cli-verify] ${context ?? 'CLI command'} — exit=${r.exitCode} | ${r.cmdLine}`);
+    logStep(`[cli-verify] ${context ?? 'CLI command'} - exit=${r.exitCode} | ${r.cmdLine}`);
     if (r.exitCode !== 0) throw cliFailureError(r, context);
     return r;
   }
   const r = result;
-  logStep(`[cli-verify] ${context ?? 'CLI command'} — exit=${r.exitCode} | ${r.cmdLine}`);
+  logStep(`[cli-verify] ${context ?? 'CLI command'} - exit=${r.exitCode} | ${r.cmdLine}`);
   if (r.exitCode !== 0) throw cliFailureError(r, context);
   return r;
 }
 
 /**
  * Assert the CLI command succeeded (exit code 0).
- * FAIL FAST — no silent swallowing of HTTP errors.
+ * FAIL FAST - no silent swallowing of HTTP errors.
  * If the CLI gets 403, 422, 404, etc., that's a real failure.
  * Same resolved-input sync-throw contract as `assertCliOk` (E2E-BI-12).
  */
@@ -631,17 +631,17 @@ export async function assertCliDispatched(
 ): Promise<CliResult> {
   if (result instanceof Promise) {
     const r = await result;
-    logStep(`[cli-verify] ${context ?? 'CLI command'} — exit=${r.exitCode} | ${r.cmdLine}`);
+    logStep(`[cli-verify] ${context ?? 'CLI command'} - exit=${r.exitCode} | ${r.cmdLine}`);
     if (r.exitCode !== 0) throw cliFailureError(r, context);
     return r;
   }
   const r = result;
-  logStep(`[cli-verify] ${context ?? 'CLI command'} — exit=${r.exitCode} | ${r.cmdLine}`);
+  logStep(`[cli-verify] ${context ?? 'CLI command'} - exit=${r.exitCode} | ${r.cmdLine}`);
   if (r.exitCode !== 0) throw cliFailureError(r, context);
   return r;
 }
 
-/** Assert the CLI command failed (exit code non-zero) — for scope-gate tests.
+/** Assert the CLI command failed (exit code non-zero) - for scope-gate tests.
  *  Same resolved-input sync-throw contract as `assertCliOk` (E2E-BI-12). */
 export async function assertCliFailed(
   result: CliResult | Promise<CliResult>,
@@ -679,7 +679,7 @@ export function extractId(result: CliResult): string {
   // Direct field
   if (typeof obj.id === 'string') return obj.id;
   if (typeof obj.uuid === 'string') return obj.uuid;
-  // Array — take first row's id
+  // Array - take first row's id
   if (Array.isArray(obj.rows) && obj.rows.length > 0) {
     const row = obj.rows[0] as Record<string, unknown>;
     if (typeof row.id === 'string') return row.id;

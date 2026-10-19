@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/func.spec.ts — E2E-CLI-7: func CLI suite — full functional E2E.
+// tests/cli/func.spec.ts - E2E-CLI-7: func CLI suite - full functional E2E.
 //
 // Full lifecycle: upload WASM → list → get → validate → activate → download → delete.
 // Uses a minimal hand-crafted WASM binary fixture (50 bytes) that exports
@@ -19,7 +19,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — func (full functional)', () => {
+test.describe('CLI - func (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('func commands are listed in list-commands', async () => {
@@ -51,7 +51,7 @@ test.describe('CLI — func (full functional)', () => {
       '--domain', domain,
       '--product-id', productId,
       '--version', versionLabel,
-      '--wasm', '',  // empty path — we'll use the body directly via `call`
+      '--wasm', '',  // empty path - we'll use the body directly via `call`
       '--language', 'typescript',
       '--hooks', 'pre_posting',
     ]);
@@ -59,7 +59,7 @@ test.describe('CLI — func (full functional)', () => {
     // The built-in upload reads from a file path. If it fails (no file),
     // fall back to the declarative `do func module create` which sends
     // the base64 in the body. But the registry's `func module` commands
-    // don't have an `upload` action — upload is a built-in CLI verb.
+    // don't have an `upload` action - upload is a built-in CLI verb.
     // So we use `call` to POST directly to the func server.
     if (r1.exitCode !== 0) {
       // Fallback: use `call` passthrough to upload
@@ -120,7 +120,7 @@ test.describe('CLI — func (full functional)', () => {
       const r6 = await cliDo('func', 'module', 'download', { id: moduleId });
       assertCliDispatched(r6, 'func module download');
 
-      // 8. Lifecycle cleanup — the service's state machine only allows
+      // 8. Lifecycle cleanup - the service's state machine only allows
       // delete on draft/deprecated modules (an active module is in use).
       // Designed transition: upload v2 for the same domain+product →
       // activate v2 → v1 becomes 'deprecated' → delete v1 → delete v2 (draft).
@@ -145,7 +145,7 @@ test.describe('CLI — func (full functional)', () => {
       const r7 = await cliDo('func', 'module', 'delete', { id: moduleId });
       assertCliDispatched(r7, 'func module delete (deprecated v1)');
 
-      // 9. Delete the (now active) v2 — activate a throwaway v3 first so
+      // 9. Delete the (now active) v2 - activate a throwaway v3 first so
       // v2 becomes deprecated and deletable.
       const v3 = await runCli([
         'call', 'func', 'POST', '/v1/modules',
@@ -165,7 +165,7 @@ test.describe('CLI — func (full functional)', () => {
       const r7b = await cliDo('func', 'module', 'delete', { id: v2Id });
       assertCliDispatched(r7b, 'func module delete (deprecated v2)');
 
-      // v3 stays active — the product still has a usable latest version.
+      // v3 stays active - the product still has a usable latest version.
 
       // 10. List modules → verify the suite's listing surface works
       const r8 = await cliDo('func', 'module', 'list', { domain, product_id: productId });

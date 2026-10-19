@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/post.spec.ts — E2E-CLI-11: post CLI suite — full functional E2E.
+// tests/cli/post.spec.ts - E2E-CLI-11: post CLI suite - full functional E2E.
 //
 // Full lifecycle: gateway create → list → test → delete.
 // Also: message list, message content, message replay.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — post (full functional)', () => {
+test.describe('CLI - post (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('post commands are listed in list-commands', async () => {

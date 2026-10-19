@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/run-id-writer.ts — side-effect module, imported ONLY by
+// fixtures/run-id-writer.ts - side-effect module, imported ONLY by
 // tests/ui/global-setup.ts as its FIRST import.
 //
 // Playwright runs globalSetup in a separate Node process from the test

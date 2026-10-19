@@ -3,16 +3,16 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// ── sentin8 platform e2e — Playwright TypeScript configuration ───────────
+// ── sentin8 platform e2e - Playwright TypeScript configuration ───────────
 //
 // Covers the Sentin8 platform admin surfaces:
-//   tests/cli/  — sentin8-cli subprocess suites (no browser)
-//   tests/ui/   — Dash RFW page suites (browser, future)
+//   tests/cli/  - sentin8-cli subprocess suites (no browser)
+//   tests/ui/   - Dash RFW page suites (browser, future)
 
 import { defineConfig, devices } from '@playwright/test';
 import { join } from 'node:path';
 // The shared loader resolves SENTIN8_DOMAIN from the tree-root `.env`
-// (no hardcoded fallback) — the same source the fleet boots from.
+// (no hardcoded fallback) - the same source the fleet boots from.
 import { platformDomain } from './fixtures/env.js';
 
 const STORAGE_STATE_PATH = join(process.cwd(), '.tmp', 'storage-state.json');
@@ -32,7 +32,7 @@ export default defineConfig({
   retries: 0,
   timeout: 120_000,
 
-  // Global setup — runs ONCE before all tests.
+  // Global setup - runs ONCE before all tests.
   // Signs in, creates org + env, saves browser storage state.
   globalSetup: './tests/ui/global-setup',
   expect: { timeout: 10_000 },

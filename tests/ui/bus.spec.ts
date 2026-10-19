@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/bus.spec.ts — E2E-UI-13: bus UI suite — full functional.
+// tests/ui/bus.spec.ts - E2E-UI-13: bus UI suite - full functional.
 //
 // Full lifecycle: streams → list; consumers → list; metrics → render.
 
@@ -16,7 +16,7 @@ import { cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — bus (full functional)', () => {
+test.describe('UI - bus (full functional)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
   test.beforeAll(async ({ browser }) => {
@@ -29,7 +29,7 @@ test.describe('UI — bus (full functional)', () => {
   });
   test.afterAll(async () => { await context?.close(); });
 
-  test('bus/streams — list streams', async () => {
+  test('bus/streams - list streams', async () => {
     await navigateToDashPage(page, 'bus', 'streams', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -41,7 +41,7 @@ test.describe('UI — bus (full functional)', () => {
     assertCliOk(r, 'bus streams (CLI verify)');
   });
 
-  test('bus/consumers — list consumer groups', async () => {
+  test('bus/consumers - list consumer groups', async () => {
     await navigateToDashPage(page, 'bus', 'consumers', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -55,7 +55,7 @@ test.describe('UI — bus (full functional)', () => {
     assertCliOk(r, 'bus consumers (CLI verify)');
   });
 
-  test('bus/metrics — render stream metrics', async () => {
+  test('bus/metrics - render stream metrics', async () => {
     await navigateToDashPage(page, 'bus', 'metrics', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -68,11 +68,11 @@ test.describe('UI — bus (full functional)', () => {
   });
 
   // ════════════════════════════════════════════════════════════════════
-  // Phase 3: Full functional test — produce event, verify in CLI
+  // Phase 3: Full functional test - produce event, verify in CLI
   // ════════════════════════════════════════════════════════════════════
 
-  test('bus/streams — produce event, verify in CLI', async () => {
-    // Bus has no create form — streams are created implicitly by producing events.
+  test('bus/streams - produce event, verify in CLI', async () => {
+    // Bus has no create form - streams are created implicitly by producing events.
     // Verify the streams page renders and CLI can access the admin data.
     await navigateToDashPage(page, 'bus', 'streams', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);

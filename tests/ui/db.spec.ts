@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/db.spec.ts — E2E-UI-6: db UI suite — full functional.
+// tests/ui/db.spec.ts - E2E-UI-6: db UI suite - full functional.
 //
 // Full lifecycle through the Dash UI:
 //   - overview → render, summary cards
@@ -21,7 +21,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — db (full functional)', () => {
+test.describe('UI - db (full functional)', () => {
   let context: BrowserContext;
   let page: Page;
   let strict: StrictPage;
@@ -39,7 +39,7 @@ test.describe('UI — db (full functional)', () => {
 
   test.afterAll(async () => { await context?.close(); });
 
-  test('db/overview — render, summary cards', async () => {
+  test('db/overview - render, summary cards', async () => {
     await navigateToDashPage(page, 'db', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -52,7 +52,7 @@ test.describe('UI — db (full functional)', () => {
     assertCliOk(r, 'db overview (CLI verify)');
   });
 
-  test('db/tables — render, table catalog', async () => {
+  test('db/tables - render, table catalog', async () => {
     await navigateToDashPage(page, 'db', 'tables', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -65,7 +65,7 @@ test.describe('UI — db (full functional)', () => {
     assertCliOk(r, 'db tables (CLI verify)');
   });
 
-  test('db/posture — render, RLS posture', async () => {
+  test('db/posture - render, RLS posture', async () => {
     await navigateToDashPage(page, 'db', 'posture', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     strict.assertNoFailures();
@@ -75,7 +75,7 @@ test.describe('UI — db (full functional)', () => {
     assertCliOk(r, 'db posture (CLI verify)');
   });
 
-  test('db/settings — render', async () => {
+  test('db/settings - render', async () => {
     await navigateToDashPage(page, 'db', 'settings', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     strict.assertNoFailures();
@@ -86,10 +86,10 @@ test.describe('UI — db (full functional)', () => {
   });
 
   // ════════════════════════════════════════════════════════════════════
-  // Phase 3: Full functional CRUD test — create table
+  // Phase 3: Full functional CRUD test - create table
   // ════════════════════════════════════════════════════════════════════
 
-  test('db/tables — create table, verify in UI + CLI', async () => {
+  test('db/tables - create table, verify in UI + CLI', async () => {
     const tableName = `e2e_table_${RUN_ID}`;
     const displayName = `E2E Table ${RUN_ID}`;
     const tablesUrl = `${URLs.dash}/#/sentin8-db/tables?env=${envId}`;

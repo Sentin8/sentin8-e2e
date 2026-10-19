@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/sys.spec.ts — E2E-CLI-4: sys CLI suite — full functional E2E.
+// tests/cli/sys.spec.ts - E2E-CLI-4: sys CLI suite - full functional E2E.
 //
 // Full lifecycle: org create→list→get, env create→list→get,
 // service list, branding get/merged, bootstrap get, readiness get, audit list.
@@ -19,7 +19,7 @@ const SYS_ENV = '00000000-0000-0000-0000-000000000002';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — sys (full functional)', () => {
+test.describe('CLI - sys (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('sys commands are listed in list-commands', async () => {
@@ -50,7 +50,7 @@ test.describe('CLI — sys (full functional)', () => {
 
   // ── Env lifecycle ──
   test('sys env create → list → get', async () => {
-    // Env creation requires org membership — target the test org created
+    // Env creation requires org membership - target the test org created
     // by globalSetup (the persona is its org-admin), not the system org.
     const orgId = getTestOrgId();
     const slug = `e2e-env-${RUN_ID}`;

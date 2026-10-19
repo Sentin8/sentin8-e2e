@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/stat.spec.ts — E2E-UI-12: stat UI suite — full functional.
+// tests/ui/stat.spec.ts - E2E-UI-12: stat UI suite - full functional.
 // Tests: overview render, properties render, events render, metrics render.
 
 import { test, expect, type BrowserContext, type Page } from '@playwright/test';
@@ -14,7 +14,7 @@ import { StrictPage } from '../../fixtures/strictpage.js';
 import { cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — stat (full functional)', () => {
+test.describe('UI - stat (full functional)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
 
@@ -31,7 +31,7 @@ test.describe('UI — stat (full functional)', () => {
     await context?.close();
   });
 
-  test('stat/overview — render, summary cards', async () => {
+  test('stat/overview - render, summary cards', async () => {
     await navigateToDashPage(page, 'stat', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -43,7 +43,7 @@ test.describe('UI — stat (full functional)', () => {
     assertCliOk(r, 'stat overview (CLI verify)');
   });
 
-  test('stat/properties — render property list', async () => {
+  test('stat/properties - render property list', async () => {
     await navigateToDashPage(page, 'stat', 'properties', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -60,7 +60,7 @@ test.describe('UI — stat (full functional)', () => {
     assertCliOk(r, 'stat properties (CLI verify)');
   });
 
-  test('stat/events — query events', async () => {
+  test('stat/events - query events', async () => {
     await navigateToDashPage(page, 'stat', 'events', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -72,7 +72,7 @@ test.describe('UI — stat (full functional)', () => {
     assertCliOk(r, 'stat events (CLI verify)');
   });
 
-  test('stat/metrics — render metrics chart', async () => {
+  test('stat/metrics - render metrics chart', async () => {
     await navigateToDashPage(page, 'stat', 'metrics', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -88,7 +88,7 @@ test.describe('UI — stat (full functional)', () => {
   // Phase 3: Full functional CRUD test (E2E-UI-Full-13)
   // ════════════════════════════════════════════════════════════════════
 
-  test('stat/properties — create property, verify in UI + CLI', async () => {
+  test('stat/properties - create property, verify in UI + CLI', async () => {
     const propName = `E2E UI Prop ${RUN_ID}`;
     const slug = `e2e-ui-prop-${RUN_ID}`;
     const propsUrl = `${URLs.dash}/#/sentin8-stat/properties?env=${envId}`;

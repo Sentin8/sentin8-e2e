@@ -2,7 +2,7 @@
   "name": "sentin8-platform-e2e-ts",
   "version": "0.1.0",
   "private": true,
-  "description": "Sentin8 platform e2e — Admin UI (Dash) + CLI full-scenario coverage.",
+  "description": "Sentin8 platform e2e - Admin UI (Dash) + CLI full-scenario coverage.",
   "type": "module",
   "engines": {
     "node": ">=20"

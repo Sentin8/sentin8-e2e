@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/bidirectional/bidirectional.spec.ts — E2E-BI-3..11: bidirectional proof for remaining services.
+// tests/bidirectional/bidirectional.spec.ts - E2E-BI-3..11: bidirectional proof for remaining services.
 //
 // Covers: app, storage, func, cron, flow, stat, post, bus, db.
 // Each test creates via CLI and verifies via UI, or vice versa.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Bidirectional proof — remaining services', () => {
+test.describe('Bidirectional proof - remaining services', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   // ── E2E-BI-3: app ──

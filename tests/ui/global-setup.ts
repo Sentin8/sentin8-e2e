@@ -3,11 +3,11 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/global-setup.ts — runs ONCE before all UI test files.
+// tests/ui/global-setup.ts - runs ONCE before all UI test files.
 //
 // Launches one browser, signs in via Dash, creates org + env,
 // and saves the browser storage state (cookies + localStorage) to a file.
-// All test files reuse this storage state — no per-file sign-in needed.
+// All test files reuse this storage state - no per-file sign-in needed.
 
 // Run-id writer MUST be imported first: its module body executes before
 // testdata.ts (imported below) initializes RUN_ID, so globalSetup writes
@@ -59,7 +59,7 @@ export async function globalSetup(): Promise<void> {
     logStep(`[pageerror] ${String(err).slice(0, 500)}`);
   });
 
-  // Sign up (idempotent — OK if user already exists).
+  // Sign up (idempotent - OK if user already exists).
   try {
     await signUpAs(
       page, context,
@@ -73,7 +73,7 @@ export async function globalSetup(): Promise<void> {
     // User may already exist.
   }
 
-  // Sign in the CLI once (device flow — stores credentials in ~/.sentin8/).
+  // Sign in the CLI once (device flow - stores credentials in ~/.sentin8/).
   await cliSignIn(Personas.admin.email, Personas.admin.password);
 
   // Sign in to Dash.
@@ -86,10 +86,10 @@ export async function globalSetup(): Promise<void> {
   const orgId = await createOrganizationViaUI(page, orgSlug, orgName);
   if (!orgId) throw new Error('globalSetup: failed to create org');
 
-  // CLI verify org — Synchronous lifecycle contract (sys DESIGN §2):
+  // CLI verify org - Synchronous lifecycle contract (sys DESIGN §2):
   // org creation returns 200 ONLY after the access model is fully
   // provisioned (record + roles/groups/creator membership + events), so
-  // the verify must succeed immediately — a 403 here is a REAL failure,
+  // the verify must succeed immediately - a 403 here is a REAL failure,
   // never a transient state to retry away.
   const orgResult = await cliCall('sys', 'GET', `/v1/org/${orgId}`, undefined, undefined);
   await assertCliOk(orgResult, 'globalSetup: CLI verify org');
@@ -97,11 +97,11 @@ export async function globalSetup(): Promise<void> {
   const envId = await createEnvironmentViaUI(page, orgId, orgSlug, `E2E Test Env ${RUN_ID}`, 'production');
   if (!envId) throw new Error('globalSetup: failed to create env');
 
-  // CLI verify env — same synchronous contract as the org verify.
+  // CLI verify env - same synchronous contract as the org verify.
   const envResult = await cliCall('sys', 'GET', `/v1/env/${envId}`, undefined, undefined);
   await assertCliOk(envResult, 'globalSetup: CLI verify env');
 
-  // Force CLI token refresh — env creation assigned env:admin role.
+  // Force CLI token refresh - env creation assigned env:admin role.
   await cliRefreshToken();
 
   // Enable acme.

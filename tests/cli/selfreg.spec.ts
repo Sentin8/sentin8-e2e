@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/selfreg.spec.ts — Service self-registration via --print-registration.
+// tests/cli/selfreg.spec.ts - Service self-registration via --print-registration.
 //
 // SELFREG-18: Verify that `--print-registration` produces correct output
 // for all services, and that `vertical enroll` with `--print-registration`
@@ -55,7 +55,7 @@ test.describe('SELFREG: --print-registration --section=service', () => {
     test(`${svc.name} --section=service returns service_type`, () => {
       const binaryPath = path.join(SENTRY8_ROOT, svc.binary);
       if (!fs.existsSync(binaryPath)) {
-        test.skip(true, `${svc.binary} not built — run \`make build-rust\``);
+        test.skip(true, `${svc.binary} not built - run \`make build-rust\``);
         return;
       }
       const result = printRegistration(binaryPath, 'service');

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/app.spec.ts — E2E-UI-8: app UI suite — full functional.
+// tests/ui/app.spec.ts - E2E-UI-8: app UI suite - full functional.
 //
 // Full lifecycle through the Dash UI:
 //   - store → list published listings, install app
@@ -21,7 +21,7 @@ import { rfwCreateViaForm, rfwVerifyInList, waitForFlutterText } from '../../fix
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — app (full functional)', () => {
+test.describe('UI - app (full functional)', () => {
   let context: BrowserContext;
   let page: Page;
   let strict: StrictPage;
@@ -39,7 +39,7 @@ test.describe('UI — app (full functional)', () => {
 
   test.afterAll(async () => { await context?.close(); });
 
-  test('app/store — list published listings', async () => {
+  test('app/store - list published listings', async () => {
     await navigateToDashPage(page, 'app', 'store', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     const texts = await getFlutterTexts(page);
@@ -52,10 +52,10 @@ test.describe('UI — app (full functional)', () => {
     assertCliOk(r, 'app store (CLI verify)');
   });
 
-  test('app/instances — list instances', async () => {
+  test('app/instances - list instances', async () => {
     await navigateToDashPage(page, 'app', 'instances', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
-    // Instances page may be empty (no apps installed) — that's OK.
+    // Instances page may be empty (no apps installed) - that's OK.
     strict.assertNoFailures();
 
     // CLI verify: app instances admin data is accessible.
@@ -64,12 +64,12 @@ test.describe('UI — app (full functional)', () => {
   });
 
   // ════════════════════════════════════════════════════════════════════
-  // Phase 3: Full functional CRUD test — create store listing
+  // Phase 3: Full functional CRUD test - create store listing
   // ════════════════════════════════════════════════════════════════════
 
-  test('app/store — create listing, verify in UI + CLI', async () => {
+  test('app/store - create listing, verify in UI + CLI', async () => {
     const appName = `E2E App ${RUN_ID}`;
-    // Distinct from the CLI suite's slug (both suites share RUN_ID —
+    // Distinct from the CLI suite's slug (both suites share RUN_ID -
     // app_slug is globally unique in app_store_listings).
     const appSlug = `e2e-app-ui-${RUN_ID}`;
     const storeUrl = `${URLs.dash}/#/app/store?env=${envId}`;

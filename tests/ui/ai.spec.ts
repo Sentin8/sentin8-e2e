@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/ai.spec.ts — Phase 31 (AI stories 31.10.4): Sentin8:AI lifecycle
+// tests/ui/ai.spec.ts - Phase 31 (AI stories 31.10.4): Sentin8:AI lifecycle
 // through the platform, per design/sentin8-sentin8-ai-technical-design.md §4
 // + services/ai/BACKLOG.md.
 //
@@ -25,7 +25,7 @@ import type { BrowserContext, Page } from '@playwright/test';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — AI (Phase 31 platform capability layer)', () => {
+test.describe('UI - AI (Phase 31 platform capability layer)', () => {
   let context: BrowserContext;
   let page: Page;
   let envId: string;
@@ -62,7 +62,7 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
     expect(jsonObj(res).origin).toBe('tenant');
   });
 
-  test('prompt versions are immutable — duplicate (name, version) is 409', async () => {
+  test('prompt versions are immutable - duplicate (name, version) is 409', async () => {
     const dup = await cliCall('ai', 'POST', '/v1/prompts', {
       name: PROMPT,
       version: 1,
@@ -70,7 +70,7 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
       model_primary: 'ollama/llama3',
       origin: 'tenant',
     }, envId);
-    // cliCall surfaces non-zero exit for 409 — assert it failed.
+    // cliCall surfaces non-zero exit for 409 - assert it failed.
     expect(dup.exitCode, 'duplicate version must be rejected').not.toBe(0);
   });
 
@@ -78,7 +78,7 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
     await assertCliOk(
       cliCall('ai', 'PUT', `/v1/budgets/${FEATURE}`, {
         // UpsertBudgetRequest requires `feature` in the body (the path
-        // segment alone is not enough — handler binds both).
+        // segment alone is not enough - handler binds both).
         feature: FEATURE,
         monthly_token_cap: 1, enforcement: 'reject',
       }, envId),
@@ -93,11 +93,11 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
   });
 
   test('retrieval with empty data_scope is fail-closed', async () => {
-    // Two fail-closed shapes are acceptable (AI design §4.6 — no chunk may
+    // Two fail-closed shapes are acceptable (AI design §4.6 - no chunk may
     // escape an empty data_scope):
-    //   a) 200 + chunks == [] — provider route exists (boot-time snapshot),
+    //   a) 200 + chunks == [] - provider route exists (boot-time snapshot),
     //      the scope filter evaluates FALSE and returns nothing.
-    //   b) exit != 0 with "no embedding provider configured" (422) — the
+    //   b) exit != 0 with "no embedding provider configured" (422) - the
     //      env has no active provider at boot; the request never reaches
     //      the data, which is equally fail-closed.
     // Routes load once at boot from the system-env provider registry, so a
@@ -125,7 +125,7 @@ test.describe('UI — AI (Phase 31 platform capability layer)', () => {
     const providers = (Array.isArray(res.json) ? res.json : []) as Array<Record<string, unknown>>;
     for (const p of providers) {
       expect(p.credential_ref).toBeTruthy();
-      // Never a plaintext credential — refs only.
+      // Never a plaintext credential - refs only.
       expect((p.credential_ref as string).startsWith('ref:'), 'credential must be a reference').toBeTruthy();
     }
   });

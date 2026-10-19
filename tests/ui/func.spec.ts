@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/func.spec.ts — E2E-UI-9: func UI suite — full functional.
+// tests/ui/func.spec.ts - E2E-UI-9: func UI suite - full functional.
 //
 // Full lifecycle: overview → render summary; versions → list modules.
 
@@ -17,7 +17,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — func (full functional)', () => {
+test.describe('UI - func (full functional)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
   test.beforeAll(async ({ browser }) => {
@@ -30,7 +30,7 @@ test.describe('UI — func (full functional)', () => {
   });
   test.afterAll(async () => { await context?.close(); });
 
-  test('func/overview — render, summary cards', async () => {
+  test('func/overview - render, summary cards', async () => {
     await navigateToDashPage(page, 'func', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     const texts = await getFlutterTexts(page);
@@ -42,10 +42,10 @@ test.describe('UI — func (full functional)', () => {
     assertCliOk(r, 'func overview (CLI verify)');
   });
 
-  test('func/versions — list module versions', async () => {
+  test('func/versions - list module versions', async () => {
     await navigateToDashPage(page, 'func', 'versions', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
-    // Versions page may be empty (no modules uploaded) — that's OK.
+    // Versions page may be empty (no modules uploaded) - that's OK.
     strict.assertNoFailures();
 
     // CLI verify: func modules admin data is accessible.
@@ -54,10 +54,10 @@ test.describe('UI — func (full functional)', () => {
   });
 
   // ════════════════════════════════════════════════════════════════════
-  // Phase 3: Full functional CRUD test — upload WASM module
+  // Phase 3: Full functional CRUD test - upload WASM module
   // ════════════════════════════════════════════════════════════════════
 
-  test('func/versions — upload module, verify in UI + CLI', async () => {
+  test('func/versions - upload module, verify in UI + CLI', async () => {
     const moduleId = `e2e-mod-${RUN_ID}`;
     const versionsUrl = `${URLs.dash}/#/sentin8-func/versions?env=${envId}`;
     // Minimal valid WASM module (magic + version, empty function).

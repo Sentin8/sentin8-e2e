@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/policy.spec.ts — Phase 28 (E2E story 28.15): tenant-authored
+// tests/ui/policy.spec.ts - Phase 28 (E2E story 28.15): tenant-authored
 // Shield policy lifecycle through the platform, per
 // design/sentin8-policy-technical-design.md §6 + §3.5.
 //
@@ -11,7 +11,7 @@
 // goes through the BFF proxy API via the CLI (sentin8-cli call post …).
 //
 // Lifecycle proven:
-//   1. List policy sets (platform scope-mirror seeded by vertical init —
+//   1. List policy sets (platform scope-mirror seeded by vertical init -
 //      ENFORCED per decision 2026-09-07 / story 28.16; shadow is the emergency
 //      rollback lever only).
 //   2. PUT a tenant-authored set (write-time validation; tenant sets start
@@ -33,7 +33,7 @@ import type { BrowserContext, Page } from '@playwright/test';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
+test.describe('UI - policy (Phase 28 tenant-authored Shield)', () => {
   let context: BrowserContext;
   let page: Page;
   let envId: string;
@@ -65,7 +65,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
       (s) => s.policy_set_name === 'scope-mirror',
     ) as Record<string, unknown> | undefined;
     expect(mirror, 'scope-mirror set seeded by vertical init').toBeTruthy();
-    // Decision 2026-09-07 (28.16): platform sets ship ENFORCED — step 5 is
+    // Decision 2026-09-07 (28.16): platform sets ship ENFORCED - step 5 is
     // the only gate; shadow remains the emergency rollback lever only.
     expect(mirror?.mode).toBe('enforced');
     expect(mirror?.origin).toBe('platform');
@@ -134,7 +134,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
       (s) => (s as Record<string, unknown>).policy_set_name === SET,
     ) as Record<string, unknown> | undefined;
     expect(row?.mode).toBe('enforced');
-    // Rollback = one UPDATE (data change, not a deploy — design §4.1).
+    // Rollback = one UPDATE (data change, not a deploy - design §4.1).
     const sh = await assertCliOk(
       cliCall('post', 'POST', '/v1/admin/policy-sets/shadow', { policy_set_name: SET }, envId),
     );
@@ -303,7 +303,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
         { label: 'Shield Policies', value: policies },
       ],
       'Create Policy Set',
-      // Mode select: keep the default "shadow" — click through the dropdown
+      // Mode select: keep the default "shadow" - click through the dropdown
       // so the field state is committed like a real user interaction.
       [{ label: 'Mode', option: 'Shadow' }],
     );
@@ -314,7 +314,7 @@ test.describe('UI — policy (Phase 28 tenant-authored Shield)', () => {
     expect(listed.stdout).toContain(UI_SET);
 
     // 3. UI: the create redirect lands on the editor page (native
-    // policy_simulator) — the editor must render with the fetched set.
+    // policy_simulator) - the editor must render with the fetched set.
     await waitForFlutterContent(page);
     await expect
       .poll(async () => page.content(), { timeout: 30_000 })

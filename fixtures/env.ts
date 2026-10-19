@@ -3,14 +3,14 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/env.ts — tree-root `.env` loader (the fleet's own configuration).
+// fixtures/env.ts - tree-root `.env` loader (the fleet's own configuration).
 //
 // The suite must test the deployment the operator actually booted, so its
 // target configuration is read from the SAME `.env` the fleet is booted
-// from — the tree-root `.env` (the sentin8/ group's `../.env`, resolved
+// from - the tree-root `.env` (the sentin8/ group's `../.env`, resolved
 // from `SENTIN8_REPO_ROOT`). There is NO hardcoded-domain fallback: URLs
 // are DERIVED from `SENTIN8_DOMAIN`, and when nothing defines it the run
-// fails right here at configuration load — never mid-test with a browser
+// fails right here at configuration load - never mid-test with a browser
 // pointed at a domain nothing serves (e2e DESIGN §4, invariant 5).
 //
 // Precedence: a variable already present in `process.env` wins (an
@@ -35,12 +35,12 @@ function repoRoot(): string {
 /**
  * Load the tree-root `.env` into `process.env` for the suite's own
  * variables. Idempotent and import-time safe (module-level, runs once
- * per process — the same discipline as fixtures/run-id-writer.ts).
+ * per process - the same discipline as fixtures/run-id-writer.ts).
  * A variable present in the real environment is never overwritten.
  */
 function loadTreeEnv(): void {
   const path = join(repoRoot(), '.env');
-  if (!existsSync(path)) return; // environment-only runs are fine — vars must still resolve.
+  if (!existsSync(path)) return; // environment-only runs are fine - vars must still resolve.
   let raw: string;
   try {
     raw = readFileSync(path, 'utf-8');
@@ -71,7 +71,7 @@ loadTreeEnv();
 /**
  * The platform root domain the suite (and the fleet) targets.
  *
- * Resolution: the real environment first, then the tree-root `.env` —
+ * Resolution: the real environment first, then the tree-root `.env` -
  * and a hard error when NEITHER defines it. There is deliberately no
  * fallback literal: a guessed domain points the whole suite at hostnames
  * nothing serves (every URL 404s at the ingress) and turns the entire
@@ -81,7 +81,7 @@ export function platformDomain(): string {
   const domain = process.env.SENTIN8_DOMAIN;
   if (!domain || domain.trim().length === 0) {
     throw new Error(
-      'SENTIN8_DOMAIN is not set — the e2e suite derives every target URL ' +
+      'SENTIN8_DOMAIN is not set - the e2e suite derives every target URL ' +
       'from it. Export it or define it in the tree-root .env ' +
       `(searched: ${join(repoRoot(), '.env')}); there is no fallback domain.`,
     );

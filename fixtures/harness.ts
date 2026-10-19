@@ -3,9 +3,9 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/harness.ts — Playwright helpers for the Sentin8 e2e suites.
+// fixtures/harness.ts - Playwright helpers for the Sentin8 e2e suites.
 //
-// This is the **platform-level** harness — it lives in sentin8/ and
+// This is the **platform-level** harness - it lives in sentin8/ and
 // contains all platform-generic Flutter CanvasKit helpers (sign-in,
 // org/env creation, sidebar navigation, feature toggles, branding).
 // Vertical e2e suites (bank8, hotel8) import from here and add
@@ -26,18 +26,18 @@ import { logStep } from './log.js';
 /**
  * Find a flt-semantics element containing the given text and dispatch
  * a synthetic click.  This is the only way to trigger Flutter
- * CanvasKit button presses — Playwright's locator click is
+ * CanvasKit button presses - Playwright's locator click is
  * intercepted by the canvas.
  */
 export async function clickFlutterButton(page: Page, text: string, exact: boolean = false): Promise<void> {
   // Find the flt-semantics button element containing the text, get its
   // bounding rect, and click at its center using Playwright's mouse.
   // This sends real pointer events that Flutter CanvasKit processes.
-  // Retry up to 10 seconds — the button might not be rendered yet, e.g.
+  // Retry up to 10 seconds - the button might not be rendered yet, e.g.
   // the org home page may be in its transient-403 retry loop right after
   // org creation (identity invalidation settle window, §3.1d-1).
   // 20s window: right after org creation the caller's identity may be cached
-  // pre-grant (§3.1d-1) — the bootstrap settle-retry needs the identity
+  // pre-grant (§3.1d-1) - the bootstrap settle-retry needs the identity
   // invalidation to land (~5s provisioning + up to 5s bus fanout) before the
   // org home renders its Create Environment button.
   const deadline = Date.now() + 20_000;
@@ -78,8 +78,8 @@ export async function clickFlutterButton(page: Page, text: string, exact: boolea
 }
 
 /**
- * Click a Flutter button (by label) that is near — i.e. inside the same
- * flt-semantics subtree as — another text label. Useful for clicking a
+ * Click a Flutter button (by label) that is near - i.e. inside the same
+ * flt-semantics subtree as - another text label. Useful for clicking a
  * "View" button in a card that also contains the row's name.
  *
  * Strategy: find the flt-semantics container whose text includes `nearText`,
@@ -162,7 +162,7 @@ export async function waitForFlutterText(page: Page, text: string, timeout = 2_0
           if (r.width > 0 && r.height > 0) return true;
         }
         // Second pass: accept zero-size elements too. CanvasKit renders
-        // text on the canvas, not in the DOM — the flt-semantics element
+        // text on the canvas, not in the DOM - the flt-semantics element
         // may have zero size but the text IS visible on the canvas.
         // Skip elements that are not connected to the DOM (stale/removed).
         for (const el of Array.from(els)) {
@@ -180,7 +180,7 @@ export async function waitForFlutterText(page: Page, text: string, timeout = 2_0
       }, needle);
       if (found) return;
     } catch {
-      // Execution context destroyed (navigation in progress) — retry.
+      // Execution context destroyed (navigation in progress) - retry.
     }
     await page.waitForTimeout(100);
   }
@@ -226,7 +226,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
         });
         if (idx >= switches.length) return null;
         const sw = switches[idx];
-        // Get the parent Row's bounding rect (the feature card) — the InkWell
+        // Get the parent Row's bounding rect (the feature card) - the InkWell
         // wraps the entire Row, so clicking the center of the Row triggers it.
         const row = sw.parentElement;
         if (row) {
@@ -256,7 +256,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
             (el as HTMLElement).style.pointerEvents = 'none';
           });
         });
-        // Click at the card center — the GestureDetector with
+        // Click at the card center - the GestureDetector with
         // HitTestBehavior.opaque should receive the pointer event.
         await page.mouse.click(rect.x, rect.y);
         await page.waitForTimeout(300);
@@ -296,7 +296,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
     }, nearbyText);
 
     if (!targetVisible) {
-      // Scroll down — try mouse wheel first, then keyboard Page Down.
+      // Scroll down - try mouse wheel first, then keyboard Page Down.
       // Flutter CanvasKit processes wheel events on the canvas.
       await page.mouse.move(400, 300);
       await page.mouse.wheel(0, 500);
@@ -322,7 +322,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
         if (t === n || a === n) { textEl = el; break; }
       }
       if (!textEl) {
-        // Try child elements — the display name might be in a child node.
+        // Try child elements - the display name might be in a child node.
         for (const el of Array.from(els)) {
           const child = el.querySelector('flt-semantics');
           if (child) {
@@ -412,7 +412,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
     }, nearbyText);
     if (rect) {
       // Try multiple approaches to toggle the switch:
-      // 1. Simulate a proper tap gesture (move, down, wait, up) — Flutter
+      // 1. Simulate a proper tap gesture (move, down, wait, up) - Flutter
       //    CanvasKit requires a proper tap gesture, not just a click event.
       // 2. Dispatch a click event on the flt-semantics element
       // 3. Playwright's getByRole locator with force click
@@ -461,7 +461,7 @@ export async function clickFlutterCheckbox(page: Page, nearbyText: string): Prom
                bestSwitch.getAttribute('aria-pressed') === 'true';
       }, nearbyText).catch(() => false);
       if (toggled) return;
-      // Not toggled by mouse click — try dispatching a click event on the
+      // Not toggled by mouse click - try dispatching a click event on the
       // flt-semantics switch element directly. Use the same y-coordinate
       // matching to find the right switch.
       const dispatched = await page.evaluate((needle: string) => {
@@ -532,7 +532,7 @@ export async function typeFlutterField(page: Page, label: string, value: string)
   // IMPORTANT: Flutter CanvasKit text fields use a custom editing host that
   // listens to real keyboard events. We focus the host, then send the
   // whole value in one shot via `page.keyboard.insertText` (a single
-  // `input` event — paste-like).  We MUST NOT use character-by-character
+  // `input` event - paste-like).  We MUST NOT use character-by-character
   // `keyboard.type(...)` because (a) it's slow and (b) the per-character
   // `input` events can race with Flutter's text-editing controller.
   //
@@ -577,7 +577,7 @@ export async function typeFlutterField(page: Page, label: string, value: string)
 
   // Helper: focus a target, clear any existing value via Ctrl+A + Delete
   // (real keyboard events, picked up by Flutter), then insert the value
-  // in one shot via `insertText` (a single `input` event — paste-like).
+  // in one shot via `insertText` (a single `input` event - paste-like).
   const fillFocused = async (): Promise<void> => {
     await page.keyboard.press('Control+A');
     await page.keyboard.press('Delete');
@@ -635,7 +635,7 @@ export async function typeFlutterField(page: Page, label: string, value: string)
       return;
     }
 
-    // None of the approaches found the textbox yet — wait briefly and retry.
+    // None of the approaches found the textbox yet - wait briefly and retry.
     await page.waitForTimeout(500);
   }
 
@@ -718,7 +718,7 @@ export async function typeFlutterFieldByIndex(
  *   3. Presses Enter to commit the scope via the field's `onSubmitted`
  *      handler, which calls `_add()` on the ScopeSelector state.
  *
- * This exercises the real widget code path — the e2e test no longer
+ * This exercises the real widget code path - the e2e test no longer
  * relies on a textual TextField that was removed in favour of the
  * structured chip-based selector.
  */
@@ -730,7 +730,7 @@ export async function addScopeViaUI(
   // The scope input may be off-screen if the form has scrolled due
   // to many chips being added above. Scroll it into view first so
   // the subsequent click and keyboard events land on the visible
-  // input — Flutter CanvasKit text fields require the input host
+  // input - Flutter CanvasKit text fields require the input host
   // to be in the viewport to receive focus.
   await scrollFlutterTextboxIntoView(page, baseIndex);
   await typeFlutterFieldByIndex(page, baseIndex, scope, { submit: true });
@@ -743,7 +743,7 @@ export async function addScopeViaUI(
  * comma-separated list.  The widget's `onSubmitted` handler splits
  * on `,` and whitespace, validates each token, and adds the
  * valid ones in one pass.  The duplicate check inside the widget
- * means already-added scopes are silently dropped — callers can
+ * means already-added scopes are silently dropped - callers can
  * safely re-submit the full list.
  *
  * @param page  Playwright page.
@@ -778,7 +778,7 @@ export async function addScopesBatchViaUI(
  * `InputChip`s below the input.
  *
  * The autocomplete enforces that the typed name matches an
- * existing candidate (defined above this row in the listing) —
+ * existing candidate (defined above this row in the listing) -
  * otherwise the typed value is silently ignored.  This is by
  * design: dangling includes are impossible by construction.
  *
@@ -787,7 +787,7 @@ export async function addScopesBatchViaUI(
  *   earlier in the same listing.
  * @param baseIndex  Index of the includes-picker textbox in the
  *   global textbox ordering.  The first role has no includes
- *   textbox rendered (no candidates yet) — callers should only
+ *   textbox rendered (no candidates yet) - callers should only
  *   pass `baseIndex >= 11` (i.e. the third role onward; the
  *   second role already has one at index 10).
  */
@@ -796,7 +796,7 @@ export async function addIncludeViaUI(
   names: string | string[],
   baseIndex: number,
 ): Promise<void> {
-  // Scroll the includes textbox into view first — the includes
+  // Scroll the includes textbox into view first - the includes
   // section sits at the bottom of the role, often off-screen.
   await scrollFlutterTextboxIntoView(page, baseIndex);
   // Accept a single name or an array.  Multiple names are typed
@@ -809,7 +809,7 @@ export async function addIncludeViaUI(
   await typeFlutterFieldByIndex(page, baseIndex, value, { submit: true });
   // Wait for the chips to render + onChanged to fire.
   await page.waitForTimeout(250);
-  // Verify the chips were actually added — guards against silent
+  // Verify the chips were actually added - guards against silent
   // drops if the typed names didn't match candidates.  Selected
   // includes are rendered as Material `InputChip`s, which Flutter
   // exposes as a `role="checkbox"` (with the chip label as the
@@ -819,7 +819,7 @@ export async function addIncludeViaUI(
     const chip = page.getByRole('checkbox', { name, exact: true });
     if ((await chip.count()) === 0) {
       throw new Error(
-        `addIncludeViaUI: include "${name}" was not committed — the autocomplete may have ` +
+        `addIncludeViaUI: include "${name}" was not committed - the autocomplete may have ` +
           `rejected it (typo? or this role is not defined above the current row?).`,
       );
     }
@@ -830,7 +830,7 @@ export async function addIncludeViaUI(
  * Add a security role to the create-listing form's [RoleSelector].
  * Clicks the "Add Role" button, then fills the role's name
  * (appending `*` if it's the default signup role), description,
- * and nested scopes — all via the actual UI controls.
+ * and nested scopes - all via the actual UI controls.
  *
  * @param baseIndex  Index of the FIRST textbox for the new role.
  *   The form has 4 prefix textboxes (App Name, Description,
@@ -854,7 +854,7 @@ export async function addRoleViaUI(
     /**
      * Names of OTHER roles (defined earlier in the same listing)
      * whose scopes should be merged into this role's permissions
-     * at install time.  Same listing only — the RoleSelector UI
+     * at install time.  Same listing only - the RoleSelector UI
      * only offers roles defined above the current row.
      */
     includes?: string[];
@@ -879,7 +879,7 @@ export async function addRoleViaUI(
   // may not focus it correctly.
   await scrollFlutterTextboxIntoView(page, baseIndex);
   // Fill the role name (textbox at baseIndex). Append `*` if this
-  // is the default signup role — the RoleSelector strips the
+  // is the default signup role - the RoleSelector strips the
   // marker and sets the default-signup pointer.
   const nameValue = isDefaultSignup ? `${role.name}*` : role.name;
   await typeFlutterFieldByIndex(page, baseIndex, nameValue);
@@ -908,11 +908,11 @@ export async function addRoleViaUI(
   if (role.includes && role.includes.length > 0) {
     // The includes textbox sits at baseIndex + 3 (name, desc,
     // scopes, includes).  The first role (baseIndex=4) has no
-    // includes textbox rendered (no candidates yet) — reject this
+    // includes textbox rendered (no candidates yet) - reject this
     // so the caller knows.
     if (baseIndex === 4) {
       throw new Error(
-        `addRoleViaUI: includes on the first role ("${role.name}") are not supported — ` +
+        `addRoleViaUI: includes on the first role ("${role.name}") are not supported - ` +
           `the autocomplete has no candidates until at least one role is defined above.`,
       );
     }
@@ -926,7 +926,7 @@ export async function addRoleViaUI(
 /**
  * Scroll the Flutter button containing the given text into the
  * viewport.  Flutter CanvasKit InkWells must be in the viewport to
- * fire their onPressed — a click at off-screen coordinates is
+ * fire their onPressed - a click at off-screen coordinates is
  * silently dropped.
  *
  * Strategy: find the button's flt-semantics rect, then scroll the
@@ -964,7 +964,7 @@ export async function scrollFlutterButtonIntoView(
     await page.keyboard.press('PageDown');
     await page.waitForTimeout(300);
   }
-  // Don't throw — clickFlutterButton will throw a clear error if
+  // Don't throw - clickFlutterButton will throw a clear error if
   // the button still can't be found after scrolling.
 }
 
@@ -1025,9 +1025,9 @@ export async function callBridge(page: Page, fn: string, ...args: string[]): Pro
 export async function getFlutterTexts(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const els = document.querySelectorAll('flt-semantics');
-    // CanvasKit renders RFW pages as accessible NAMES (aria-label) —
+    // CanvasKit renders RFW pages as accessible NAMES (aria-label) -
     // e.g. the app store's listing cards are labeled groups with NO DOM
-    // text content — so the harvest must include the label, mirroring
+    // text content - so the harvest must include the label, mirroring
     // waitForFlutterText's two-pass strategy below.
     return Array.from(els).flatMap((el) => {
       const a = el as HTMLElement;
@@ -1045,7 +1045,7 @@ export async function waitForFlutterContent(page: Page, timeout = 15_000): Promi
   while (Date.now() < deadline) {
     const texts = await getFlutterTexts(page);
     if (texts.length > 0) {
-      // Check for RFW error states — the page may have rendered text
+      // Check for RFW error states - the page may have rendered text
       // but it's just "Failed to load admin UI" or "No content".
       // Wait a bit more in case the real content is still loading.
       const allText = texts.join(' ');
@@ -1055,20 +1055,20 @@ export async function waitForFlutterContent(page: Page, timeout = 15_000): Promi
       // Transient identity-propagation 403 (policy design §3.1d-1): a
       // freshly created env can 403 its first admin-UI loads for ~1-2s
       // until the invalidation event propagates. The RFW page's own
-      // Retry button is the user-level recovery — click it once (a real
+      // Retry button is the user-level recovery - click it once (a real
       // user would); keep waiting for the content to settle.
       if (!clickedRetry && allText.includes('forbidden by policy')) {
         clickedRetry = true;
         try {
           await clickFlutterButton(page, 'Retry');
         } catch {
-          // Retry button may already be gone (content landed) — fine.
+          // Retry button may already be gone (content landed) - fine.
         }
       }
     }
     await page.waitForTimeout(100);
   }
-  // No content rendered (or only error content) — fail fast with a
+  // No content rendered (or only error content) - fail fast with a
   // descriptive error instead of letting the caller's expect() produce
   // a generic "0 > 0" message.
   const url = page.url();
@@ -1086,7 +1086,7 @@ export interface Harness {
   browser: Browser;
   context: BrowserContext;
   page: Page;
-  /** Internal — closes the browser and context. */
+  /** Internal - closes the browser and context. */
   _close(): Promise<void>;
 }
 
@@ -1096,12 +1096,12 @@ export interface Harness {
  * ignoreHTTPSErrors option).
  */
 export async function newHarness(): Promise<Harness> {
-  // We use playwright's own launch — the test runner provides a
+  // We use playwright's own launch - the test runner provides a
   // browser via the project config.  This helper is for ad-hoc use
   // (e.g. tests that want their own browser outside the runner).
   const { chromium } = await import('@playwright/test');
   const browser = await chromium.launch({
-    // Headed by default (visible browser) — PLAYWRIGHT_HEADLESS=true for CI.
+    // Headed by default (visible browser) - PLAYWRIGHT_HEADLESS=true for CI.
     headless: (process.env.PLAYWRIGHT_HEADLESS ?? 'false') === 'true',
     args: [
       '--window-size=1280,800',
@@ -1152,7 +1152,7 @@ export function clearAuthRateLimits(email: string): void {
     // Best-effort.
   }
   // Then clear ALL rate-limit keys via SCAN (covers any email/IP variations
-  // — the auth server may store a slightly different email key than expected
+  // - the auth server may store a slightly different email key than expected
   // due to form encoding, and the IP may vary).
   try {
     execSync(`valkey-cli ${dbFlag} --scan --pattern 'auth:rate:*' | xargs -r valkey-cli ${dbFlag} del`, { stdio: 'pipe', timeout: 2_000 });
@@ -1166,7 +1166,7 @@ export function clearAuthRateLimits(email: string): void {
  * exists (config-level storageState from global setup, or a prior
  * sign-in in this context), Dash renders an authenticated page
  * (org dashboard / organization picker) and the "Sign in" button
- * never appears — the sign-in flow below would time out waiting for it.
+ * never appears - the sign-in flow below would time out waiting for it.
  *
  * Markers mirror the Flutter sources:
  *   - sign-in page  (apps/dash/lib/pages/sign_in_page.dart):
@@ -1198,7 +1198,7 @@ export async function isDashSignedIn(page: Page, timeout = 2_000): Promise<boole
       if (state === 'in') return true;
       if (state === 'out') return false;
     } catch {
-      // Execution context destroyed (navigation in progress) — retry.
+      // Execution context destroyed (navigation in progress) - retry.
     }
     await page.waitForTimeout(100);
   }
@@ -1216,13 +1216,13 @@ export async function isDashSignedIn(page: Page, timeout = 2_000): Promise<boole
  */
 export async function signInToDash(page: Page, context: BrowserContext, email: string, password: string): Promise<void> {
   clearAuthRateLimits(email);
-  // Do NOT clear cookies — Playwright's clearCookies() wipes ALL domains,
+  // Do NOT clear cookies - Playwright's clearCookies() wipes ALL domains,
   // which would destroy unrelated tenant BFF8 sessions. Each app's session
   // cookie is scoped to its own domain (e.g. bff8.dash.ops.sys.local.sentin8.dev)
   // so they don't conflict. The BFF8 OAuth flow handles session refresh.
   await page.goto(URLs.dash, { waitUntil: 'domcontentloaded' });
   if (await isDashSignedIn(page)) {
-    logStep(`[step] signInToDash: already signed in — skipping sign-in flow for ${email}`);
+    logStep(`[step] signInToDash: already signed in - skipping sign-in flow for ${email}`);
     return;
   }
   logStep(`[step] signInToDash: signing in ${email}`);
@@ -1234,7 +1234,7 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
   await page.waitForTimeout(300);
   await typeFlutterField(page, 'Password', password);
   await page.waitForTimeout(300);
-  // Clear rate limits again right before submitting — the form took
+  // Clear rate limits again right before submitting - the form took
   // a few seconds to fill, and a previous test's sign-in may have
   // incremented the counter in that window.
   clearAuthRateLimits(email);
@@ -1284,7 +1284,7 @@ export async function signUpAs(
   _auth8Origin: string,
 ): Promise<void> {
   logStep(`[step] signUpAs: signing up ${email} (${firstName} ${lastName})`);
-  // Do NOT clear cookies — see signInToDash for rationale.
+  // Do NOT clear cookies - see signInToDash for rationale.
   // Navigate to Dash with a cache-busting param to avoid cached redirects.
   await page.goto(`${URLs.dash}?_=${Date.now()}`, { waitUntil: 'domcontentloaded' });
   // Wait for the Dash sign-in page to render, then click "Sign up"
@@ -1308,7 +1308,7 @@ export async function signUpAs(
         await page.mouse.click(rect.x, rect.y);
         clicked = true;
       }
-    } catch { /* page navigating — retry */ }
+    } catch { /* page navigating - retry */ }
     if (!clicked) await page.waitForTimeout(200);
   }
   if (!clicked) throw new Error('Could not find and click "Sign up" on Dash sign-in page');
@@ -1328,7 +1328,7 @@ async function signUpOnAuth8(
 ): Promise<void> {
   logStep(`[step] signUpOnAuth8: filling form for ${email}`);
   await waitForFlutterSemantics(page, 2_000);
-  // The auth8-ui may land on the sign-in page first — click "Sign up"
+  // The auth8-ui may land on the sign-in page first - click "Sign up"
   // to switch to the sign-up form, but only if the sign-up form isn't
   // already visible (e.g. when navigated directly to /sign-up).
   let hasSignUpForm = false;
@@ -1349,7 +1349,7 @@ async function signUpOnAuth8(
       return false;
     }, 'first name (optional)');
   } catch {
-    // Navigation in progress — assume sign-up form not visible yet.
+    // Navigation in progress - assume sign-up form not visible yet.
   }
   if (!hasSignUpForm) {
     await clickFlutterButton(page, 'Sign up');
@@ -1379,7 +1379,7 @@ async function signUpOnAuth8(
       return !!document.querySelector('flt-semantics[role="checkbox"]');
     });
   } catch {
-    // Execution context destroyed (navigation in progress) — the form
+    // Execution context destroyed (navigation in progress) - the form
     // submitted successfully, so we're no longer on the sign-up page.
     stillOnSignUp = false;
   }
@@ -1419,7 +1419,7 @@ export async function signUpViaApp(
   password: string,
 ): Promise<void> {
   logStep(`[step] signUpViaApp: signing up ${email} at ${appURL}`);
-  // Navigate to the app. Retry on connection reset — the proxy may need
+  // Navigate to the app. Retry on connection reset - the proxy may need
   // to fetch a TLS cert from ACME on the first request (1-2s).
   let lastErr: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -1457,7 +1457,7 @@ export async function signUpViaApp(
   // (a) redirect to /sign-in for the user to sign in, or
   // (b) go directly to the OAuth consent page (/oauth/authorize) if the
   //     sign-up auto-creates a session.
-  // Handle both paths — poll for either URL pattern.
+  // Handle both paths - poll for either URL pattern.
   let pathResolved = false;
   for (let retry = 0; retry < 30; retry++) {
     await page.waitForTimeout(1000);
@@ -1469,7 +1469,7 @@ export async function signUpViaApp(
       pathResolved = true;
       break;
     } else if (url.includes('/oauth/') || url.includes('authorize') || url.includes('/consent')) {
-      // Path (b): consent page — click "Authorize" to continue.
+      // Path (b): consent page - click "Authorize" to continue.
       await waitForFlutterSemantics(page, 2_000);
       await page.waitForTimeout(2000);
       // The consent page's "Authorize" button triggers a POST to
@@ -1534,12 +1534,12 @@ export async function signInToTenantAuth8(
 ): Promise<void> {
   clearAuthRateLimits(email);
   logStep(`[step] signInToTenantAuth8: signing in ${email} at ${appURL}`);
-  // Do NOT clear cookies — see signInToDash for rationale.
+  // Do NOT clear cookies - see signInToDash for rationale.
   await page.goto(appURL, { waitUntil: 'domcontentloaded' });
   await waitForFlutterSemantics(page, 2_000);
   // The app may already have a valid BFF8 session (e.g. if the user
   // signed up moments ago and the session cookie is still valid). In
-  // that case the app shows the authenticated dashboard directly — no
+  // that case the app shows the authenticated dashboard directly - no
   // "Sign In" button. Check for "Sign In" first; if it's not visible
   // within a few seconds, assume we're already authenticated and skip
   // the sign-in flow.
@@ -1548,10 +1548,10 @@ export async function signInToTenantAuth8(
     await waitForFlutterText(page, 'Sign In', 2_000);
     needsSignIn = true;
   } catch {
-    // No "Sign In" button — already authenticated (dashboard visible).
+    // No "Sign In" button - already authenticated (dashboard visible).
   }
   if (!needsSignIn) {
-    // Already authenticated — wait for the dashboard to settle and return.
+    // Already authenticated - wait for the dashboard to settle and return.
     const authDeadline = Date.now() + 2_000;
     while (Date.now() < authDeadline) {
       const texts = await getFlutterTexts(page);
@@ -1581,7 +1581,7 @@ export async function signInToTenantAuth8(
   while (Date.now() < callbackDeadline) {
     const url = page.url();
     if (!url.includes('/sign-in') && !url.includes('/oauth/') && !url.includes('/auth/callback')) {
-      break; // Redirected to the app frontend — OAuth callback completed.
+      break; // Redirected to the app frontend - OAuth callback completed.
     }
     await page.waitForTimeout(500);
   }
@@ -1615,7 +1615,7 @@ export async function signInToTenantAuth8(
  *
  * The Create Org page uses the shared [ClickableSubdomainField] widget
  * (click-to-edit). The default platform domain is shown in read-only
- * mode (e.g. `{slug}.{DOMAIN}` — DOMAIN from the tree-root `.env`); clicking the field switches to
+ * mode (e.g. `{slug}.{DOMAIN}` - DOMAIN from the tree-root `.env`); clicking the field switches to
  * edit mode where the full value is editable in a single TextField
  * (no fixed suffix). The user types the custom domain, then clicks
  * the green tick icon to commit.
@@ -1630,13 +1630,13 @@ export async function setOrgDomainViaUI(
   orgSlug: string,
   customDomain: string,
 ): Promise<void> {
-  // Compute the platform default — this is the text shown in the
+  // Compute the platform default - this is the text shown in the
   // read-only display before we click into edit mode.
   const defaultDomain = `${orgSlug}.${DOMAIN}`;
   // Click the edit icon (a small inkwell wrapping the pencil icon)
   // to enter edit mode. The previous widget version made the whole
   // read-only text a tap target, which shifted focus to the first
-  // form field (e.g. Organization Name) on click — breaking all
+  // form field (e.g. Organization Name) on click - breaking all
   // subsequent typing. The new design only the edit icon triggers
   // edit mode. The icon has a `tooltip: 'Edit'` and a unique
   // position in the row (between the text and the reset icon).
@@ -1752,7 +1752,7 @@ export async function setOrgDomainViaUI(
  *
  * The widget renders the read-only state as a Row with:
  *   1. A non-clickable text label (the current value).
- *   2. The edit icon (an IconButton with tooltip "Edit") — this
+ *   2. The edit icon (an IconButton with tooltip "Edit") - this
  *      is the ONLY clickable affordance that triggers edit mode.
  *   3. A "Restore platform default" IconButton (also clickable).
  *
@@ -1760,7 +1760,7 @@ export async function setOrgDomainViaUI(
  * node's `textContent` (the `text` field in the accessibility tree).
  * We find the button by its visible text "Edit" and click it. If
  * multiple "Edit" buttons exist on the page, we pick the LAST one
- * (rightmost / lowest in DOM order) — the field's edit icon is
+ * (rightmost / lowest in DOM order) - the field's edit icon is
  * rendered after the text label and before the reset icon, in DOM
  * order. On the Create Org page there is only one such button.
  *
@@ -1804,7 +1804,7 @@ async function clickEditIcon(page: Page): Promise<void> {
 /**
  * Inspect the page semantics to find the read-only ClickableSubdomainField
  * value. In the new widget design, the read-only value is displayed as
- * plain Text (inside a Container), NOT as a button — the Edit icon is
+ * plain Text (inside a Container), NOT as a button - the Edit icon is
  * the only clickable affordance. We look for any flt-semantics element
  * (generic, text, or button) whose text content matches the custom
  * domain. Returns the text if found, or empty string if still in edit
@@ -1828,7 +1828,7 @@ export async function createOrganizationViaUI(
   customDomain?: string,
 ): Promise<string> {
   logStep(`[step] createOrganizationViaUI: creating org slug=${orgSlug} name=${orgName} domain=${customDomain ?? '(default)'}`);
-  // Navigate to the Create Org page explicitly — the Dash app may show
+  // Navigate to the Create Org page explicitly - the Dash app may show
   // the main shell for users with sys:users role instead of auto-redirecting.
   await page.goto(`${URLs.dash}/#/org/create`, { waitUntil: 'domcontentloaded' });
   await waitForFlutterSemantics(page, 2_000);
@@ -1842,7 +1842,7 @@ export async function createOrganizationViaUI(
   if (customDomain) {
     await setOrgDomainViaUI(page, orgSlug, customDomain);
   }
-  // Click the "Create" button. EXACT match — the org-picker page
+  // Click the "Create" button. EXACT match - the org-picker page
   // (reachable in the stale semantics tree during the hash-route
   // transition) has a broader "Create Organization" button whose
   // includes-match would shadow the form's exact "Create" and
@@ -1850,7 +1850,7 @@ export async function createOrganizationViaUI(
   //
   // RETRY LOOP: the form runs a debounced (500ms) slug-availability
   // check whose response triggers a setState that can SHIFT the button's
-  // rect between the coordinate read and the mouse click — the first
+  // rect between the coordinate read and the mouse click - the first
   // click can land on stale coordinates and be silently ignored. Retry
   // (re-reading the rect each time) until the URL navigates or the
   // deadline passes; a submitted org navigates to /home?org={id}.
@@ -1858,7 +1858,7 @@ export async function createOrganizationViaUI(
   let submitted = false;
   while (Date.now() < clickDeadline && !submitted) {
     // Poll the URL until EITHER the org navigated (submitted) or a
-    // short in-flight window passed — the POST /v1/o can take 4+ seconds
+    // short in-flight window passed - the POST /v1/o can take 4+ seconds
     // (provisioning is synchronous in-process, sys DESIGN §2), so the
     // poll window per click attempt must exceed that, not a fixed 2s.
     const attemptDeadline = Date.now() + 8_000;
@@ -1869,7 +1869,7 @@ export async function createOrganizationViaUI(
       if (u.includes('org=') && !u.includes('/org/create')) submitted = true;
     }
   }
-  // Wait for redirect to the org page — the URL changes from /org/create
+  // Wait for redirect to the org page - the URL changes from /org/create
   // to /home?org={orgId} (query-param routing). Wait up to 10 seconds.
   const deadline = Date.now() + 2_000;
   while (Date.now() < deadline) {
@@ -1883,7 +1883,7 @@ export async function createOrganizationViaUI(
   const url = page.url();
   const match = url.match(/[?&]org=([0-9a-f-]{36})/i) || url.match(/\/org\/([0-9a-f-]{36})/i);
   if (match) return match[1];
-  // Dash didn't navigate — manually navigate back to the org picker
+  // Dash didn't navigate - manually navigate back to the org picker
   // and click on the newly created org to enter it.
   logStep(`[step] createOrganizationViaUI: URL did not navigate (${url}), going back to org picker`);
   await page.goto(`${URLs.dash}`, { waitUntil: 'domcontentloaded' });
@@ -1933,12 +1933,12 @@ export async function createEnvironmentViaUI(
   if (rect) {
     await page.mouse.click(rect.x, rect.y);
   } else {
-    // EXACT match — the org-picker's "Create Organization" button would
+    // EXACT match - the org-picker's "Create Organization" button would
     // shadow the form's "Create" on an includes-match (2026-10-10).
     await clickFlutterButton(page, 'Create', true);
   }
   // Wait for redirect to the env page. The app's Navigator state is the
-  // authoritative signal — read it from the test bridge (sentin8TestGetLastRoute,
+  // authoritative signal - read it from the test bridge (sentin8TestGetLastRoute,
   // set by _generateRoute); the browser URL can lag the Navigator.
   const deadline = Date.now() + 10_000;
   let lastRoute = '';
@@ -1952,7 +1952,7 @@ export async function createEnvironmentViaUI(
   await page.waitForTimeout(500);
   // The create env page calls AuthProvider.instance.init() after creation,
   // which re-fetches the BFF8 session so the new env-admin role scopes are
-  // picked up — no manual refresh needed.
+  // picked up - no manual refresh needed.
   // Extract the env ID from the app's route (or the URL as a fallback).
   const routeMatch = lastRoute.match(/[?&]env=([0-9a-f-]{36})/i) || lastRoute.match(/\/env\/([0-9a-f-]{36})/i);
   if (routeMatch) return routeMatch[1];
@@ -1970,7 +1970,7 @@ export async function createEnvironmentViaUI(
       .slice(0, 5)
       .join(' | '),
   );
-  throw new Error(`Could not extract env ID from route "${lastRoute}" / URL: ${url}${pageText ? ` — page error: ${pageText}` : ''}`);
+  throw new Error(`Could not extract env ID from route "${lastRoute}" / URL: ${url}${pageText ? ` - page error: ${pageText}` : ''}`);
 }
 
 /** Set the auth domain for an env (toggles the hostname on Auth8 settings).
@@ -2017,12 +2017,12 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
     const label = path[i];
     const isLast = i === path.length - 1;
     if (isLast) {
-      // Leaf item — click the button at the calculated index to target the
+      // Leaf item - click the button at the calculated index to target the
       // child that appeared after parent expansion, not a top-level duplicate.
       // Try getByRole first, then fall back to coordinate-based click.
       //
       // Some sidebar labels carry a parenthetical that loads asynchronously
-      // (e.g. "Organization (iBank)" — the "(iBank)" part comes from a
+      // (e.g. "Organization (iBank)" - the "(iBank)" part comes from a
       // SYS8 fetch in _loadNames, which races with the test).  When the
       // fetch hasn't completed yet, the button is just "Organization" and
       // a substring match for "Organization (iBank)" fails.  We retry for
@@ -2141,7 +2141,7 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
         await page.waitForTimeout(500);
       }
     } else {
-      // Parent item — click to expand. Use getByRole for reliability.
+      // Parent item - click to expand. Use getByRole for reliability.
       // Count how many buttons with the *next* label exist before expansion
       // so we can skip them when clicking the leaf.
       const nextLabel = path[i + 1];
@@ -2150,7 +2150,7 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
       // If the child is already visible (beforeCount > 0), the parent
       // is likely already expanded from a previous navigation (e.g. the
       // second call to createListingViaUI navigates App8 > Store again).
-      // We still try the expansion strategies below — if the parent was
+      // We still try the expansion strategies below - if the parent was
       // NOT actually expanded (the child label exists elsewhere, e.g.
       // "Settings" appears as both an env-level item AND an FDX8 child),
       // the strategies will expand it and produce more child buttons.
@@ -2161,9 +2161,9 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
       let effectiveBeforeCount = beforeCount;
 
       // Try multiple click strategies. Flutter CanvasKit InkWell can be
-      // finicky — try getByRole click, then coordinate-based click, then
+      // finicky - try getByRole click, then coordinate-based click, then
       // direct DOM click on the semantics element.
-      // Always run these — even when expanded=true, because the parent
+      // Always run these - even when expanded=true, because the parent
       // might not actually be expanded (beforeCount > 0 from a different
       // source). The strategies only set expanded=true when afterCount
       // increases, so a no-op click on an already-expanded parent is safe.
@@ -2224,7 +2224,7 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
                   r = parent.getBoundingClientRect();
                 }
               }
-              // Use x/y even if still zero-size — CanvasKit places
+              // Use x/y even if still zero-size - CanvasKit places
               // flt-semantics at the correct canvas coordinates.
               if (r.x > 0 || r.y > 0) {
                 return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
@@ -2302,7 +2302,7 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
         } catch { /* fall through */ }
       }
 
-      // Set the skip count for the leaf — always, even when the parent
+      // Set the skip count for the leaf - always, even when the parent
       // was already expanded.  This ensures the leaf click skips the
       // pre-existing buttons with the same label (e.g. the env-level
       // "Settings" button when expanding FDX8 to click its "Settings"
@@ -2319,12 +2319,12 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
       // accessibility tree).
       // Set the skip count for the leaf.
       // When the parent was NOT expanded (no new children appeared),
-      // effectiveBeforeCount == beforeCount — the child is already visible
+      // effectiveBeforeCount == beforeCount - the child is already visible
       // at its existing index, so leafSkipCount = 0 (don't skip it).
       // When the strategies DID expand the parent (new children appeared),
-      // effectiveBeforeCount == afterCount (the new total) — but we want
+      // effectiveBeforeCount == afterCount (the new total) - but we want
       // to click the child that JUST appeared, which is at index
-      // (beforeCount) — the count of buttons before expansion.
+      // (beforeCount) - the count of buttons before expansion.
       if (i + 1 === path.length - 1) {
         leafSkipCount = effectiveBeforeCount > beforeCount ? beforeCount : 0;
       }
@@ -2386,9 +2386,9 @@ export async function navigateViaSidebar(page: Page, path: string[]): Promise<vo
 
 /**
  * Enable a list of platform features (e.g. storage, db, func) for the
- * given env. Toggles each feature switch — toggling now saves
+ * given env. Toggles each feature switch - toggling now saves
  * automatically (no separate Save button).
- * Navigates via the sidebar (like a human) — no direct URL redirects.
+ * Navigates via the sidebar (like a human) - no direct URL redirects.
  */
 /**
  * Map a feature key (e.g. "storage") to the display name shown in the
@@ -2414,7 +2414,7 @@ export function featDisplayName(feat: string): string {
 
 export async function enableFeatureViaUI(page: Page, orgID: string, envID: string, ...features: string[]): Promise<void> {
   logStep(`[step] enableFeatureViaUI: org=${orgID} env=${envID} features=[${features.join(', ')}]`);
-  // Wait for the sidebar to show "Settings" — confirms DashShell rebuilt.
+  // Wait for the sidebar to show "Settings" - confirms DashShell rebuilt.
   await waitForFlutterText(page, 'Settings', 2_000);
   await page.waitForTimeout(500);
   // Navigate to the env settings page via sidebar.
@@ -2424,13 +2424,13 @@ export async function enableFeatureViaUI(page: Page, orgID: string, envID: strin
   await waitForFlutterSemantics(page, 2_000);
   // Wait for the "Services" heading to confirm we're on the settings page.
   await waitForFlutterText(page, 'Services', 2_000);
-  // Click each feature's "Enable {DisplayName}" button — each click auto-saves.
+  // Click each feature's "Enable {DisplayName}" button - each click auto-saves.
   // The display name comes from the UI's _FeatureMeta in env_settings_page.dart.
   for (const feat of features) {
     const displayLabel = featDisplayName(feat);
     const enableBtn = `Enable ${displayLabel}`;
     // Check if the feature is already enabled (button shows "Enabled" not "Enable X").
-    // If already enabled, skip — no need to click.
+    // If already enabled, skip - no need to click.
     // Check if "Enable {displayLabel}" text exists on the page.
     // If it doesn't but "Enabled" buttons exist, the feature is already on.
     const hasEnableButton = await page.evaluate((needle: string) => {
@@ -2442,7 +2442,7 @@ export async function enableFeatureViaUI(page: Page, orgID: string, envID: strin
       return false;
     }, enableBtn);
     if (!hasEnableButton) {
-      logStep(`[step] enableFeatureViaUI: ${feat} already enabled (no "${enableBtn}" button found) — skipping`);
+      logStep(`[step] enableFeatureViaUI: ${feat} already enabled (no "${enableBtn}" button found) - skipping`);
       continue;
     }
     // Wait for the button to appear.
@@ -2468,7 +2468,7 @@ export async function enableFeatureViaUI(page: Page, orgID: string, envID: strin
         await page.waitForTimeout(2000);
         logStep(`[step] enableFeatureViaUI: ${feat} enabled (clicked via case-insensitive match)`);
       } catch (e2) {
-        logStep(`[step] enableFeatureViaUI: ${feat} — could not click "${enableBtn}": ${e2}`);
+        logStep(`[step] enableFeatureViaUI: ${feat} - could not click "${enableBtn}": ${e2}`);
       }
     }
     await page.evaluate(() => {
@@ -2478,7 +2478,7 @@ export async function enableFeatureViaUI(page: Page, orgID: string, envID: strin
     });
   }
   // The sidebar picks up feature changes immediately via AuthProvider
-  // notifications — no page reload needed. Just wait for semantics to settle.
+  // notifications - no page reload needed. Just wait for semantics to settle.
   await waitForFlutterSemantics(page, 500);
 }
 
@@ -2489,7 +2489,7 @@ export async function enableFeatureViaUI(page: Page, orgID: string, envID: strin
  * "Enable Data Provider" button.  The page auto-saves on click.
  *
  * The FDX8 *feature* must already be enabled (call
- * `enableFeatureViaUI(..., 'fdx8')` first) — the Settings page shows
+ * `enableFeatureViaUI(..., 'fdx8')` first) - the Settings page shows
  * "feature not enabled" otherwise.
  *
  * @returns true if the button transitioned to "Enabled" (i.e. the env
@@ -2501,7 +2501,7 @@ export async function enableFdxDataProviderViaUI(
   _envID: string,
 ): Promise<boolean> {
   logStep(`[step] enableFdxDataProviderViaUI: org=${_orgID} env=${_envID}`);
-  // Wait for the FDX8 sidebar item to appear — it only shows after the
+  // Wait for the FDX8 sidebar item to appear - it only shows after the
   // fdx8 feature is enabled. The sidebar rebuilds async via
   // AuthProvider.notifyFeatureChange() → _reloadFeatures().
   await waitForFlutterText(page, 'FDX', 2_000);
@@ -2564,7 +2564,7 @@ export async function createListingViaUI(
   scopes?: string,
 ): Promise<string> {
   logStep(`[step] createListingViaUI: appName=${appName} slug=${appSlug} scopes=${scopes ?? '(none)'}`);
-  // Wait for the sidebar to show "App8" — this confirms the
+  // Wait for the sidebar to show "App8" - this confirms the
   // DashShell has rebuilt after refreshAndInit and _loadNames()
   // has fetched the env features (app8 is enabled by default).
   // Without this wait, navigateViaSidebar(['App', 'Store']) fails
@@ -2588,14 +2588,14 @@ export async function createListingViaUI(
   await typeFlutterField(page, 'Description', description);
   await page.waitForTimeout(100);
   try { await typeFlutterField(page, 'Backend URL', _backendUrl); await page.waitForTimeout(100); } catch { /* no backend URL field */ }
-  // OAuth scopes (optional) — submit the whole list at once as a
+  // OAuth scopes (optional) - submit the whole list at once as a
   // comma-separated string.  The [ScopeSelector] widget splits on
   // `,`/whitespace and adds all valid scopes in one pass.
   if (scopes && scopes.length > 0) {
     const scopeList = scopes.split(/[\s,]+/).filter((s) => s.length > 0);
     await addScopesBatchViaUI(page, scopeList, 3);
   }
-  // Security groups are NO LONGER declared on the listing — they are
+  // Security groups are NO LONGER declared on the listing - they are
   // materialized per-instance at install time based on instanceName.
   // See Epic 12.4 / design/sentin8-app8-technical-design.md §4.1.1.
   // Click "Create & Publish" to submit.
@@ -2605,7 +2605,7 @@ export async function createListingViaUI(
   // re-render with the new listing.
   await page.waitForTimeout(500);
 
-  // Get the listing ID from the Flutter app's test bridge — the ID is set
+  // Get the listing ID from the Flutter app's test bridge - the ID is set
   // by the same _createListing() method that the "Create & Publish" button
   // triggers, so this is UI-driven (no direct API call).  Poll for up
   // to 5 seconds since the bridge value is set after the POST returns.
@@ -2620,7 +2620,7 @@ export async function createListingViaUI(
   }
   if (listingId) return listingId;
   // Fallback: verify the listing was found on the page at least.
-  throw new Error(`Could not verify listing creation for "${appName}" (slug: ${appSlug}) — page navigated but app name not found on listings page`);
+  throw new Error(`Could not verify listing creation for "${appName}" (slug: ${appSlug}) - page navigated but app name not found on listings page`);
 }
 
 /** Set org branding (logo URL, primary/accent colors, font, theme). */
@@ -2646,7 +2646,7 @@ export async function setOrgBrandingViaUI(
   await typeFlutterField(page, 'Primary Color', primary);
   await typeFlutterField(page, 'Accent Color', accent);
   await typeFlutterField(page, 'Font Family', font);
-  // Select the theme mode — click the appropriate ChoiceChip.
+  // Select the theme mode - click the appropriate ChoiceChip.
   // Flutter renders ChoiceChip as a `checkbox` role in the accessibility
   // tree (it has a `selected` boolean state), not as a `button`. Use the
   // `checkbox` role and fall back to `button` if the version of Flutter
@@ -2669,7 +2669,7 @@ export async function setOrgBrandingViaUI(
   } else if (theme === 'dark') {
     await clickChip('Dark');
   } else {
-    // Default (Dark) — no click needed (it's the default).
+    // Default (Dark) - no click needed (it's the default).
   }
   // Scroll to the bottom to ensure the Save button is visible.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -2700,7 +2700,7 @@ export async function assertSessionCookieSet(context: BrowserContext, name: stri
 }
 
 export async function assertOnDash(page: Page): Promise<void> {
-  // DERIVED from the suite's domain (e2e DESIGN §4 invariant 5) — never a
+  // DERIVED from the suite's domain (e2e DESIGN §4 invariant 5) - never a
   // hardcoded hostname literal.
   expect(page.url()).toContain(`dash.ops.sys.${DOMAIN}`);
 }
@@ -2755,7 +2755,7 @@ export async function uploadFilesToStorageViaUI(
     await page.waitForTimeout(500);
   }
 
-  // Navigate into the "branding" bucket — click "View" near the "branding" text.
+  // Navigate into the "branding" bucket - click "View" near the "branding" text.
   // Wait for the DataTable to load the bucket row (FutureBuilder fetch).
   await waitForFlutterText(page, 'branding', 2_000);
   await page.waitForTimeout(500);
@@ -2784,7 +2784,7 @@ export async function uploadFilesToStorageViaUI(
     await waitForFlutterSemantics(page, 2_000);
     await page.waitForTimeout(500);
 
-    // Verify the upload succeeded — check for error text on the page.
+    // Verify the upload succeeded - check for error text on the page.
     const hasError = await page.evaluate(() => {
       const els = document.querySelectorAll('flt-semantics');
       for (const el of Array.from(els)) {
@@ -2832,7 +2832,7 @@ export async function uploadFileToStorageViaUI(
  * Navigates to Auth8 → Users, clicks "Create User", fills the dialog
  * (first name, last name, email, password), and submits.
  *
- * For org-scoped staff users, pass the staff env ID — the function navigates
+ * For org-scoped staff users, pass the staff env ID - the function navigates
  * to that env's Auth > Users page (Auth is env-scoped, so we must be in an
  * env to see the Auth sidebar item).
  *
@@ -2849,7 +2849,7 @@ export async function createUserViaUI(
   envName?: string,
 ): Promise<void> {
   logStep(`[step] createUserViaUI: scope=${scope} email=${user.email} (${user.firstName} ${user.lastName})`);
-  // Auth is env-scoped — navigate to the env's Auth > Users via sidebar.
+  // Auth is env-scoped - navigate to the env's Auth > Users via sidebar.
   if (scope === 'org' && envId) {
     // Navigate to org home, then click into the target env to enter env scope.
     await navigateViaSidebar(page, ['Organization']);
@@ -2862,7 +2862,7 @@ export async function createUserViaUI(
     // Wait for the Auth sidebar item to appear (vertical services load async).
     await waitForFlutterText(page, 'Auth', 2_000);
     await page.waitForTimeout(500);
-    // Now at env scope — Auth > Users is visible in the sidebar.
+    // Now at env scope - Auth > Users is visible in the sidebar.
     await navigateViaSidebar(page, ['Auth', 'Users']);
   } else {
     await navigateViaSidebar(page, ['Auth', 'Users']);
@@ -2916,7 +2916,7 @@ export async function addUserToGroupViaUI(
   envName?: string,
 ): Promise<void> {
   logStep(`[step] addUserToGroupViaUI: scope=${scope} group=${groupName} user=${userEmail}`);
-  // Auth is env-scoped — navigate to the env's Auth > Groups via sidebar.
+  // Auth is env-scoped - navigate to the env's Auth > Groups via sidebar.
   if (scope === 'org' && envId) {
     // Navigate to org home, then click into the target env to enter env scope.
     await navigateViaSidebar(page, ['Organization']);
@@ -2994,7 +2994,7 @@ export async function addUserToGroupViaUI(
   await clickFlutterButton(page, 'Save Group');
   await page.waitForTimeout(2000);
 
-  // Verify the save succeeded — check for error text on the page.
+  // Verify the save succeeded - check for error text on the page.
   const hasError = await page.evaluate(() => {
     const els = document.querySelectorAll('flt-semantics');
     for (const el of Array.from(els)) {
@@ -3058,7 +3058,7 @@ export async function installAppViaUI(
   await page.waitForTimeout(1000);
 
   // Click the "Install" button on the specific listing's card.
-  // The store uses a GridView — each card has the app name text and an
+  // The store uses a GridView - each card has the app name text and an
   // Install IconButton. With multiple listings, there are multiple "Install"
   // buttons. We use the aria snapshot to find the Install button index that
   // corresponds to the target listing.
@@ -3093,13 +3093,13 @@ export async function installAppViaUI(
       // Stop if we hit another listing name (different card).
       if (foundName && trimmed && !trimmed.includes('button') && !trimmed.includes('Install') &&
           trimmed.length > 2 && trimmed.length < 30 && !trimmed.startsWith('-')) {
-        // Could be another listing name — but we need to be careful.
+        // Could be another listing name - but we need to be careful.
         // Only break if it looks like a card name (not a description).
-        // Actually, let's not break — the Install button should come
+        // Actually, let's not break - the Install button should come
         // before the next card in tree order.
       }
     }
-  } catch { /* ariaSnapshot might not work — fall through to coordinate-based */ }
+  } catch { /* ariaSnapshot might not work - fall through to coordinate-based */ }
 
   let installClicked = false;
   if (installBtnIndex >= 0) {
@@ -3177,7 +3177,7 @@ export async function installAppViaUI(
     await typeFlutterField(page, 'Instance Name (optional)', instanceName);
   }
 
-  // Auth URL + Allow Sign-up — the install form has:
+  // Auth URL + Allow Sign-up - the install form has:
   // 1. "Auth URL" select dropdown (defaults to current env's auth)
   // 2. "Allow Sign-up" checkbox (defaults to checked = customer mode)
   //
@@ -3192,14 +3192,14 @@ export async function installAppViaUI(
     await clickFlutterButton(page, staffAuthUrl);
     await page.waitForTimeout(300);
 
-    // Uncheck "Allow Sign-up" — staff apps have SSO only, no public sign-up.
+    // Uncheck "Allow Sign-up" - staff apps have SSO only, no public sign-up.
     logStep(`[step] installAppViaUI: unchecking Allow Sign-up (staff mode)`);
     await clickFlutterCheckbox(page, 'Allow Sign-up');
     await page.waitForTimeout(300);
   }
 
   // Click the "Install" button in the dialog (a FilledButton, not IconButton).
-  // Use getByRole — the dialog's Install FilledButton responds to getByRole clicks.
+  // Use getByRole - the dialog's Install FilledButton responds to getByRole clicks.
   try {
     const btn = page.getByRole('button', { name: 'Install', exact: true });
     const count = await btn.count();
@@ -3215,7 +3215,7 @@ export async function installAppViaUI(
   } catch { /* fall through */ }
 
   // Check for error messages on the page after clicking Install.
-  // The RFW form shows errors inline — don't silently move on if the
+  // The RFW form shows errors inline - don't silently move on if the
   // install failed. Only check short text elements to avoid false
   // positives from large container elements that concatenate all page text.
   await page.waitForTimeout(500);
@@ -3236,13 +3236,13 @@ export async function installAppViaUI(
     throw new Error(`installAppViaUI: install failed for "${listingName}": ${installError}`);
   }
 
-  // Wait for redirect to the Instances page — the install success
+  // Wait for redirect to the Instances page - the install success
   // redirects to the instances list which shows the new instance.
   await waitForFlutterText(page, 'Instances', 2_000);
 
   // The hostname is deterministic: {subdomain}.{envSlug}.{orgDomain} when a
   // custom subdomain was supplied, else {appSlug}.{envSlug}.{orgDomain}.
-  // The caller (test) owns the hostname value it persists to state — we
+  // The caller (test) owns the hostname value it persists to state - we
   // return '' because the dialog only sends the subdomain prefix and the
   // full hostname is assembled server-side.
   return '';
@@ -3321,11 +3321,11 @@ export async function rfwCreateViaForm(
   try {
     // Navigate to the list page via the sidebar (like a human).
     await navigateToDashHashUrl(page, listUrl);
-    // Click the "Create X" action button — retry in case the RFW page
+    // Click the "Create X" action button - retry in case the RFW page
     // hasn't fully loaded the action button yet, AND re-verify the form
-    // actually opened (the Flutter web a11y tree can be stale — a click on
+    // actually opened (the Flutter web a11y tree can be stale - a click on
     // a stale element's boundingBox is swallowed without navigating, leaving
-    // the helper typing into a page with no fields — incident 2026-09-09).
+    // the helper typing into a page with no fields - incident 2026-09-09).
     const firstFieldLabel = fields[0]?.label ?? '';
     let clickOk = false;
     for (let attempt = 0; attempt < 5 && !clickOk; attempt++) {
@@ -3340,7 +3340,7 @@ export async function rfwCreateViaForm(
       await waitForFlutterSemantics(page, 10_000);
       // Flutter web headless renders text fields as real <input>/<textarea>
       // elements carrying aria-label (the flt-semantics tree only exposes
-      // role="textbox" for FOCUSED fields — never rely on it for presence).
+      // role="textbox" for FOCUSED fields - never rely on it for presence).
       const formVisible = await page.evaluate((label) => {
         const n = label.toLowerCase();
         for (const el of Array.from(document.querySelectorAll('input, textarea'))) {
@@ -3377,7 +3377,7 @@ export async function rfwCreateViaForm(
         await page.waitForTimeout(200);
       }
     }
-    // Submit the form — retry in case the submit button wasn't enabled yet.
+    // Submit the form - retry in case the submit button wasn't enabled yet.
     const submitDeadline = Date.now() + 3_000;
     while (Date.now() < submitDeadline) {
       try {
@@ -3390,14 +3390,14 @@ export async function rfwCreateViaForm(
     await page.waitForTimeout(1000);
 
     // FAIL FAST: check for HTTP errors during form submission.
-    // Retry on 502 (upstream temporarily unavailable — service restart race).
+    // Retry on 502 (upstream temporarily unavailable - service restart race).
     // A retried submit can log an earlier 4xx before a successful one (the
     // submit loop clicks again when the first click fires before fields are
-    // validated) — only fail when NO response in the flow ultimately
+    // validated) - only fail when NO response in the flow ultimately
     // succeeded (2xx/3xx).
     const is502 = httpErrors.some(e => e.startsWith('502'));
     const is502Only = is502 && httpErrors.every(e => e.startsWith('502'));
-    // allResponses entries are "<status> <path>" — success = 2xx/3xx status prefix.
+    // allResponses entries are "<status> <path>" - success = 2xx/3xx status prefix.
     const anySuccess = allResponses.some(r => /^(20[0-9]|30[0-9]) /.test(r));
     if (httpErrors.length > 0 && !is502Only && !anySuccess) {
       const texts = await getFlutterTexts(page);
@@ -3408,7 +3408,7 @@ export async function rfwCreateViaForm(
       );
     }
     if (httpErrors.length > 0 && anySuccess) {
-      // A 2xx/3xx response exists — the submission ultimately succeeded.
+      // A 2xx/3xx response exists - the submission ultimately succeeded.
       logStep(`[step] rfwCreateViaForm: ${httpErrors.length} transient HTTP error(s) superseded by a successful response`);
     }
 
@@ -3416,7 +3416,7 @@ export async function rfwCreateViaForm(
     if (allResponses.length === 0) {
       const texts = await getFlutterTexts(page);
       throw new Error(
-        `rfwCreateViaForm: no API calls detected — form submission likely failed.\n` +
+        `rfwCreateViaForm: no API calls detected - form submission likely failed.\n` +
         `Submit label used: "${submitLabel}"\n` +
         `Visible texts: ${texts.slice(0, 20).join(' | ')}`
       );
@@ -3489,10 +3489,10 @@ export async function rfwRowAction(
   // Click the action button INSIDE the row card that contains the identifier.
   // The RFW DataTable renders each row as a Card whose subtree holds the row
   // text AND its action buttons; a page-wide `clickFlutterButton(actionLabel)`
-  // clicks the FIRST matching button in the a11y tree — which can belong to a
+  // clicks the FIRST matching button in the a11y tree - which can belong to a
   // different row (incident 2026-09-09: page-wide "Delete" hit the
   // scope-mirror row while the test asserted the tenant row was removed).
-  // CanvasKit paints row text on the CANVAS — the card's textContent only
+  // CanvasKit paints row text on the CANVAS - the card's textContent only
   // carries the button labels; the row fields live in the card group's
   // aria-label, so the container match must read BOTH.
   const locate = ({ needle, action }: { needle: string; action: string }) =>
@@ -3502,7 +3502,7 @@ export async function rfwRowAction(
     const els = Array.from(document.querySelectorAll('flt-semantics'));
     // Candidate row cards: the SMALLEST element whose text contains the row
     // identifier AND an action button label. Page-level containers also carry
-    // every row's text in their aria-label — walking all candidates and
+    // every row's text in their aria-label - walking all candidates and
     // picking the smallest matching subtree prevents an ancestor match from
     // clicking another row's button (the a11y tree lists rows in render
     // order; an ancestor hit clicks the FIRST row's action).
@@ -3515,7 +3515,7 @@ export async function rfwRowAction(
     if (!best) return null;
     // Within the smallest card's subtree, find the action button.
     // (Array.from: NodeListOf predates the DOM.Iterable iteration
-    // protocols this tsconfig's lib set targets — an explicit spread
+    // protocols this tsconfig's lib set targets - an explicit spread
     // keeps the for-of valid under every lib combination.)
     for (const btn of Array.from(best.querySelectorAll('flt-semantics'))) {
       const bt = `${btn.textContent ?? ''} ${btn.getAttribute('aria-label') ?? ''}`.trim().toLowerCase();
@@ -3543,7 +3543,7 @@ export async function rfwRowAction(
   if (!clicked) {
     throw new Error(
       `rfwRowAction: no visible row card contains "${rowIdentifier}" with an ` +
-      `${actionLabel} button after 10s — refusing a page-wide click that can ` +
+      `${actionLabel} button after 10s - refusing a page-wide click that can ` +
       `target a different row.`,
     );
   }

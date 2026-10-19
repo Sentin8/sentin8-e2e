@@ -3,10 +3,10 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/secrets.spec.ts — E2E-UI: secrets admin suite (Phase 34, story 34.3.3).
+// tests/ui/secrets.spec.ts - E2E-UI: secrets admin suite (Phase 34, story 34.3.3).
 //
 // Full admin lifecycle through the BFF proxy ONLY (no psql, no direct
-// backend writes — AGENTS.md E2E rules): create a secret via the admin UI
+// backend writes - AGENTS.md E2E rules): create a secret via the admin UI
 // form → verify in the list → metadata check (no value leak) → disable.
 
 import { test, expect, type BrowserContext, type Page } from '@playwright/test';
@@ -20,7 +20,7 @@ const SECRET_NAME = () => `e2e-stripe-${RUN_ID}`;
 const SECRET_VALUE = () => `sk-e2e-${RUN_ID}`;
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — secrets (admin lifecycle)', () => {
+test.describe('UI - secrets (admin lifecycle)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
 
@@ -33,7 +33,7 @@ test.describe('UI — secrets (admin lifecycle)', () => {
   });
   test.afterAll(async () => { await context?.close(); });
 
-  test('secrets/overview — page renders', async () => {
+  test('secrets/overview - page renders', async () => {
     await navigateToDashPage(page, 'secrets', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -41,14 +41,14 @@ test.describe('UI — secrets (admin lifecycle)', () => {
     strict.assertNoFailures();
   });
 
-  test('secrets — create via UI form, verify in list + CLI', async () => {
+  test('secrets - create via UI form, verify in list + CLI', async () => {
     // Create via the admin UI form (like a human).
     await rfwCreateViaForm(page, `${URLs.dash}/#/sentin8-secrets/secrets/new?env=${envId}`, 'Add Secret', [
       { label: 'Secret Name', value: SECRET_NAME() },
       { label: 'Secret Value', value: SECRET_VALUE() },
     ], 'Store Secret', []);
 
-    // UI verify: the secret appears in the list (name only — never value).
+    // UI verify: the secret appears in the list (name only - never value).
     const inUi = await rfwVerifyInList(page, `${URLs.dash}/#/sentin8-secrets/secrets?env=${envId}`, SECRET_NAME(), 5_000);
     expect(inUi).toBeTruthy();
 
@@ -57,7 +57,7 @@ test.describe('UI — secrets (admin lifecycle)', () => {
     assertCliOk(r, 'secrets list (CLI verify)');
   });
 
-  test('secrets — metadata responses never leak the value', async () => {
+  test('secrets - metadata responses never leak the value', async () => {
     const r = await cliCall('secrets', 'GET', '/v1/admin/secrets', undefined, envId);
     assertCliOk(r, 'secrets metadata (CLI verify)');
     const body = typeof r === 'string' ? r : JSON.stringify(r);

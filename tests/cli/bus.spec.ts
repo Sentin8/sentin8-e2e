@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/bus.spec.ts — E2E-CLI-10: bus CLI suite — full functional E2E.
+// tests/cli/bus.spec.ts - E2E-CLI-10: bus CLI suite - full functional E2E.
 //
 // Full lifecycle: produce → consume → ack → verify empty.
 // Also: stream list, stream lag, dlq list, nack round-trip.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — bus (full functional)', () => {
+test.describe('CLI - bus (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('bus commands are listed in list-commands', async () => {
@@ -34,7 +34,7 @@ test.describe('CLI — bus (full functional)', () => {
     // VDC-2 (bus DESIGN §4.3): the event type's FIRST segment = the owning
     // vertical, matched against the producer's M2M `vertical` claim. The
     // CLI-driven produce rides the cli-producer M2M workload (vertical
-    // 'sentin8'), so the event must carry the platform vertical —
+    // 'sentin8'), so the event must carry the platform vertical -
     // vertical:service:resource:operation = sentin8:e2e:test:event.
     const eventType = `sentin8:e2e:test:event`;
     const payload = JSON.stringify({ message: 'hello from E2E', run_id: RUN_ID });

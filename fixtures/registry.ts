@@ -3,12 +3,12 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/registry.ts — load admin_ui + cli_commands from sentin8/vertical-registry.json.
+// fixtures/registry.ts - load admin_ui + cli_commands from sentin8/vertical-registry.json.
 //
 // Story E2E-UI-2: Registry-driven test generation. The suites load the
 // admin_ui and cli_commands arrays at runtime and assert every declared
 // page/command is exercised. A coverage guard fails on any untested
-// surface — making the matrix self-enforcing.
+// surface - making the matrix self-enforcing.
 
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -71,10 +71,10 @@ const EMPTY_REGISTRY: RegistryData = {
 
 async function loadRegistry(): Promise<RegistryData> {
   if (_registry) return _registry;
-  // The registry mirror lives in the sentin8/ group repo — resolved from
+  // The registry mirror lives in the sentin8/ group repo - resolved from
   // the tree root (SENTIN8_REPO_ROOT override → tree-root resolution in
   // fixtures/env.ts), never a hardcoded absolute path (defect class:
-  // /home/<user> literals — RS-13).
+  // /home/<user> literals - RS-13).
   const registryPath = join(
     process.env.SENTIN8_REPO_ROOT ?? treeRoot(),
     'sentin8',
@@ -83,9 +83,9 @@ async function loadRegistry(): Promise<RegistryData> {
   // OPTIONAL mirror: the authoritative command/audit surface is the DB
   // registry `vertical enroll` populates (cli DESIGN §…, e2e DESIGN §4);
   // this file was a monorepo-era convenience that carried ZERO
-  // cli_commands even there — every historical run's device-flow token
+  // cli_commands even there - every historical run's device-flow token
   // rode the four base OIDC scopes. Abstaining (empty registry, the
-  // exact historical behavior) must never abort the run — and it MUST
+  // exact historical behavior) must never abort the run - and it MUST
   // NOT fall back to a guessed path (invariant: derived, never guessed).
   if (!existsSync(registryPath)) {
     _registry = EMPTY_REGISTRY;
@@ -145,7 +145,7 @@ export async function loadPagesForService(service: string): Promise<AdminUiPage[
 /**
  * Collect all unique scopes declared in the registry's `cli_commands`.
  * Used by the device-flow sign-in to request a token that covers every
- * service command — so no command gets a 403 for missing scopes.
+ * service command - so no command gets a 403 for missing scopes.
  *
  * Scopes are extracted from each `cli_commands` entry's `scope` field.
  * Empty scopes (e.g. acme's public CA download) are skipped.

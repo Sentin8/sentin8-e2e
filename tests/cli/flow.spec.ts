@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/flow.spec.ts — E2E-CLI-9: flow CLI suite — full functional E2E.
+// tests/cli/flow.spec.ts - E2E-CLI-9: flow CLI suite - full functional E2E.
 //
 // Full lifecycle: workflow create → list → get → cancel.
 // Also: retry, repair, resume.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — flow (full functional)', () => {
+test.describe('CLI - flow (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('flow commands are listed in list-commands', async () => {
@@ -32,7 +32,7 @@ test.describe('CLI — flow (full functional)', () => {
       logic_id: logicId,
       version: 1,
       // ManualDecisionStep parks the workflow in `waiting` (engine §step
-      // dispatch: execute_manual_decision → StepOutcome::Waiting) — a
+      // dispatch: execute_manual_decision → StepOutcome::Waiting) - a
       // deterministic cancellable state. A BasicStep without a wasm module
       // succeeds instantly, racing any subsequent cancel into a
       // terminal-state conflict.
@@ -74,7 +74,7 @@ test.describe('CLI — flow (full functional)', () => {
       const r5 = await cliDo('flow', 'workflow', 'get', { id: workflowId });
       assertCliDispatched(r5, 'flow workflow get (after cancel)');
 
-      // NOTE: retry is a valid transition only for FAILED workflows — the
+      // NOTE: retry is a valid transition only for FAILED workflows - the
       // service correctly rejects `retry` on a cancelled workflow with 400
       // ("only failed workflows can be retried"), so it is not exercised here.
     }

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/sys.spec.ts — E2E-UI-15: sys UI suite — full functional.
+// tests/ui/sys.spec.ts - E2E-UI-15: sys UI suite - full functional.
 //
 // Full lifecycle through the Dash UI:
 //   - Org home → render, list envs
@@ -28,7 +28,7 @@ import { cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — sys (full functional)', () => {
+test.describe('UI - sys (full functional)', () => {
   let context: BrowserContext;
   let page: Page;
   let strict: StrictPage;
@@ -49,8 +49,8 @@ test.describe('UI — sys (full functional)', () => {
   test.afterAll(async () => { await context?.close(); });
 
   // ── Org home → list envs ──
-  test('sys org home — render, list envs', async () => {
-    // Navigate to the test org's home page (org-specific URL — not sidebar-navigable).
+  test('sys org home - render, list envs', async () => {
+    // Navigate to the test org's home page (org-specific URL - not sidebar-navigable).
     await page.goto(`${URLs.dash}/#/home?org=${orgId}`, { waitUntil: 'domcontentloaded' });
     await waitForFlutterSemantics(page, 10_000);
     strict.assertNoFailures();
@@ -61,8 +61,8 @@ test.describe('UI — sys (full functional)', () => {
   });
 
   // ── Org settings → render ──
-  test('sys org settings — render', async () => {
-    // Navigate to the test org's settings page (org-specific URL — not sidebar-navigable).
+  test('sys org settings - render', async () => {
+    // Navigate to the test org's settings page (org-specific URL - not sidebar-navigable).
     await page.goto(`${URLs.dash}/#/settings?org=${orgId}`, { waitUntil: 'domcontentloaded' });
     await waitForFlutterSemantics(page, 10_000);
     strict.assertNoFailures();
@@ -73,7 +73,7 @@ test.describe('UI — sys (full functional)', () => {
   });
 
   // ── Env settings → render, enable features ──
-  test('sys env settings — render, enable db + storage', async () => {
+  test('sys env settings - render, enable db + storage', async () => {
     await navigateToDashPage(page, 'sys', 'settings', undefined, envId);
     // Try enabling db and storage features
     try {
@@ -87,7 +87,7 @@ test.describe('UI — sys (full functional)', () => {
   });
 
   // ── Branding → set org branding ──
-  test('sys branding — set org branding via UI', async () => {
+  test('sys branding - set org branding via UI', async () => {
     try {
       await setOrgBrandingViaUI(page, orgId, '', '#1E6BFF', '#003366', '', '', '');
     } catch { /* branding UI may differ */ }
@@ -99,7 +99,7 @@ test.describe('UI — sys (full functional)', () => {
   });
 
   // ── Audit → list events ──
-  test('sys audit — render audit log', async () => {
+  test('sys audit - render audit log', async () => {
     await navigateToDashPage(page, 'sys', 'audit', undefined, envId);
     // The audit page may get 403 from the audit API for non-sys:admin users.
     // Just verify the page renders (the AuditPage handles errors gracefully).

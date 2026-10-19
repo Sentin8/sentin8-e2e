@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/auth.spec.ts — E2E-UI-5: auth UI suite — full functional.
+// tests/ui/auth.spec.ts - E2E-UI-5: auth UI suite - full functional.
 //
 // Full lifecycle through the Dash UI:
 //   - Navigate to Auth → Users → create user → verify in list
@@ -30,7 +30,7 @@ import { cliDo, cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — auth (full functional)', () => {
+test.describe('UI - auth (full functional)', () => {
   let context: BrowserContext;
   let page: Page;
   let strict: StrictPage;
@@ -53,7 +53,7 @@ test.describe('UI — auth (full functional)', () => {
   test.afterAll(async () => { await context?.close(); });
 
   // ── Users page: create a real user ──
-  test('auth/users — navigate, create user, verify in list', async () => {
+  test('auth/users - navigate, create user, verify in list', async () => {
     await navigateToDashPage(page, 'auth', 'users', orgId, envId);
     await waitForFlutterText(page, 'Users', 4_000);
 
@@ -79,7 +79,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Roles page: navigate and render ──
-  test('auth/roles — navigate, render', async () => {
+  test('auth/roles - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'roles', orgId, envId);
     await waitForFlutterText(page, 'Role', 5_000);
     strict.assertNoFailures();
@@ -90,7 +90,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Groups page: navigate and render ──
-  test('auth/groups — navigate, render', async () => {
+  test('auth/groups - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'groups', orgId, envId);
     await waitForFlutterText(page, 'Group', 5_000);
     strict.assertNoFailures();
@@ -101,7 +101,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Sessions page ──
-  test('auth/sessions — navigate, render', async () => {
+  test('auth/sessions - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'sessions', orgId, envId);
     strict.assertNoFailures();
 
@@ -111,7 +111,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Settings page ──
-  test('auth/settings — navigate, render', async () => {
+  test('auth/settings - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'settings', orgId, envId);
     strict.assertNoFailures();
 
@@ -121,7 +121,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── MFA page ──
-  test('auth/mfa — navigate, render', async () => {
+  test('auth/mfa - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'mfa', orgId, envId);
     strict.assertNoFailures();
 
@@ -131,7 +131,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── API Keys page ──
-  test('auth/api-keys — navigate, render', async () => {
+  test('auth/api-keys - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'api-keys', orgId, envId);
     strict.assertNoFailures();
 
@@ -141,7 +141,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Connections page ──
-  test('auth/connections — navigate, render', async () => {
+  test('auth/connections - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'connections', orgId, envId);
     strict.assertNoFailures();
 
@@ -151,7 +151,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Applications page ──
-  test('auth/applications — navigate, render', async () => {
+  test('auth/applications - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'applications', orgId, envId);
     strict.assertNoFailures();
 
@@ -161,7 +161,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Security page ──
-  test('auth/security — navigate, render', async () => {
+  test('auth/security - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'security', orgId, envId);
     strict.assertNoFailures();
 
@@ -171,7 +171,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Branding page (read-only) ──
-  test('auth/branding — navigate, render', async () => {
+  test('auth/branding - navigate, render', async () => {
     await navigateToDashPage(page, 'auth', 'branding', orgId, envId);
     strict.assertNoFailures();
 
@@ -185,7 +185,7 @@ test.describe('UI — auth (full functional)', () => {
   // ════════════════════════════════════════════════════════════════════
 
   // ── Roles: create role via UI form, verify in UI + CLI ──
-  test('auth/roles — create role, verify in UI + CLI', async () => {
+  test('auth/roles - create role, verify in UI + CLI', async () => {
     const roleName = `e2e-role-${RUN_ID}`;
     const rolesUrl = `${URLs.dash}/#/auth/roles?env=${envId}`;
 
@@ -207,7 +207,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Groups: create group via UI form, verify in UI + CLI ──
-  test('auth/groups — create group, verify in UI + CLI', async () => {
+  test('auth/groups - create group, verify in UI + CLI', async () => {
     const groupName = `e2e-group-${RUN_ID}`;
     const groupsUrl = `${URLs.dash}/#/auth/groups?env=${envId}`;
 
@@ -228,7 +228,7 @@ test.describe('UI — auth (full functional)', () => {
   });
 
   // ── Users: create user via UI form, verify in UI + CLI ──
-  test('auth/users — create user, verify in UI + CLI', async () => {
+  test('auth/users - create user, verify in UI + CLI', async () => {
     const userEmail = `e2e-user-${RUN_ID}@a.co`;
     const usersUrl = `${URLs.dash}/#/auth/users?env=${envId}`;
 
@@ -254,17 +254,17 @@ test.describe('UI — auth (full functional)', () => {
   });
 
 // ═══════════════════════════════════════════════════════════════════
-// E2E-UI-Full-3..7 — row-action CRUD round-trips (create → verify →
+// E2E-UI-Full-3..7 - row-action CRUD round-trips (create → verify →
 // row-action → verify gone). The bidirectional proof pattern (design §1.1):
 // every mutation validated from the other surface (CLI verify).
 // ═══════════════════════════════════════════════════════════════════
 
-// ── Full-3: api-keys — create via UI form, verify in UI + CLI, revoke ──
-test('auth/api-keys — create via form, verify, revoke via row action', async () => {
+// ── Full-3: api-keys - create via UI form, verify in UI + CLI, revoke ──
+test('auth/api-keys - create via form, verify, revoke via row action', async () => {
   const keyName = `e2e-key-${RUN_ID}`;
   const keysUrl = `${URLs.dash}/#/auth/api-keys?env=${envId}`;
 
-  // Create via form — the /new page path goes BEFORE the query string
+  // Create via form - the /new page path goes BEFORE the query string
   // (…#/auth/api-keys/new?env=X), otherwise the hash router treats the
   // whole thing as the `api-keys` list route with a garbage env value.
   const newKeyUrl = `${URLs.dash}/#/auth/api-keys/new?env=${envId}`;
@@ -283,7 +283,7 @@ test('auth/api-keys — create via form, verify, revoke via row action', async (
   await rfwRowAction(page, keysUrl, keyName, 'Revoke');
 
   // Verify revoked: the list keeps a soft-revoked row (status changes to
-  // 'revoked' — the row is retained for audit), so "gone" means the CLI
+  // 'revoked' - the row is retained for audit), so "gone" means the CLI
   // list no longer reports it as active.
   const afterRevoke = await cliCall('auth', 'GET', '/v1/admin/api-keys', undefined, envId);
   assertCliOk(afterRevoke, 'auth api-key list (after revoke)');
@@ -294,8 +294,8 @@ test('auth/api-keys — create via form, verify, revoke via row action', async (
   strict.assertNoFailures();
 });
 
-// ── Full-4: connections — create via UI form, verify, delete ──
-test('auth/connections — create via form, verify, delete via row action', async () => {
+// ── Full-4: connections - create via UI form, verify, delete ──
+test('auth/connections - create via form, verify, delete via row action', async () => {
   const connName = `e2e-conn-${RUN_ID}`;
   const connsUrl = `${URLs.dash}/#/auth/connections?env=${envId}`;
 
@@ -312,9 +312,9 @@ test('auth/connections — create via form, verify, delete via row action', asyn
   strict.assertNoFailures();
 });
 
-// ── Full-5: applications — register OAuth client via form, verify, delete ──
-test('auth/applications — register via form, verify, delete', async () => {
-  // client_id is globally unique — distinct from the app-store slug used by
+// ── Full-5: applications - register OAuth client via form, verify, delete ──
+test('auth/applications - register via form, verify, delete', async () => {
+  // client_id is globally unique - distinct from the app-store slug used by
   // the CLI/other suites that share RUN_ID.
   const appName = `e2e-ui-app-${RUN_ID}`;
   const appsUrl = `${URLs.dash}/#/auth/applications?env=${envId}`;
@@ -335,8 +335,8 @@ test('auth/applications — register via form, verify, delete', async () => {
   strict.assertNoFailures();
 });
 
-// ── Full-7: users/invite — fill invite form, submit, verify success ──
-test('auth/users/invite — fill invite form, submit, verify', async () => {
+// ── Full-7: users/invite - fill invite form, submit, verify success ──
+test('auth/users/invite - fill invite form, submit, verify', async () => {
   const inviteEmail = `e2e-invite-${RUN_ID}@a.co`;
   const inviteUrl = `${URLs.dash}/#/auth/users/invite?env=${envId}`;
 

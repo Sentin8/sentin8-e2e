@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/db.spec.ts — E2E-CLI-14: db CLI suite — full functional E2E.
+// tests/cli/db.spec.ts - E2E-CLI-14: db CLI suite - full functional E2E.
 //
 // Full lifecycle: table create → list → get → data insert → query →
 // update → delete → posture get → audit list → table archive → drop.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — db (full functional)', () => {
+test.describe('CLI - db (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('db commands are listed in list-commands', async () => {
@@ -33,7 +33,7 @@ test.describe('CLI — db (full functional)', () => {
     const tableName = `e2e_table_${RUN_ID}`;
     const displayName = `E2E Table ${RUN_ID}`;
 
-    // 1. Create a real table with columns — the data handlers store rows in
+    // 1. Create a real table with columns - the data handlers store rows in
     // physical tables built from this column list, so `title` must exist
     // before insert/update reference it.
     const r1 = await cliDo('db', 'table', 'create', {
@@ -77,7 +77,7 @@ test.describe('CLI — db (full functional)', () => {
       });
       assertCliDispatched(r5, 'db data query');
 
-      // 6. Update the data — contract: UpdateRequest {table, filter, set}.
+      // 6. Update the data - contract: UpdateRequest {table, filter, set}.
       // P0 handlers filter on id only, so fetch the row id from the query
       // result (QueryResponse { rows: [...] }).
       const qResp = r5.json as { rows?: Array<Record<string, unknown>> } | Array<Record<string, unknown>> | undefined;
@@ -94,7 +94,7 @@ test.describe('CLI — db (full functional)', () => {
       const r7 = await cliDo('db', 'data', 'query', { table: tableName });
       assertCliDispatched(r7, 'db data query (after update)');
 
-      // 8. Delete the data — contract: DeleteRequest {table, filter} with id.
+      // 8. Delete the data - contract: DeleteRequest {table, filter} with id.
       const r8 = await cliDo('db', 'data', 'delete', {
         table: tableName,
         filter: JSON.stringify(rowId ? { id: rowId } : {}),

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/state.ts — cross-suite state shared via .e2e-state.json.
+// fixtures/state.ts - cross-suite state shared via .e2e-state.json.
 //
 // CLI suites pass IDs and tokens via this file so later suites can
 // read them (e.g. a user created in the auth suite is used by the

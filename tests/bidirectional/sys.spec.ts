@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/bidirectional/sys.spec.ts — E2E-BI-2: bidirectional proof for sys.
+// tests/bidirectional/sys.spec.ts - E2E-BI-2: bidirectional proof for sys.
 //
 // Direction A (UI → CLI): Create org via Dash UI → verify via CLI `sys org list`.
 // Direction B (CLI → UI): Create org via CLI `sys org create` → verify via Dash UI.
@@ -16,7 +16,7 @@ import { ensureSignedIn } from '../cli/_setup.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('Bidirectional proof — sys', () => {
+test.describe('Bidirectional proof - sys', () => {
   let context: BrowserContext;
   let page: Page;
 

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/cron.spec.ts — E2E-CLI-8: cron CLI suite — full functional E2E.
+// tests/cli/cron.spec.ts - E2E-CLI-8: cron CLI suite - full functional E2E.
 //
 // Full lifecycle: schedule create → list → get → pause → resume → delete.
 // Also: job list, dlq list.
@@ -15,7 +15,7 @@ import { RUN_ID } from '../../fixtures/testdata.js';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('CLI — cron (full functional)', () => {
+test.describe('CLI - cron (full functional)', () => {
   test.beforeAll(async () => { await ensureSignedIn(); });
 
   test('cron commands are listed in list-commands', async () => {

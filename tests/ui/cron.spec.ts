@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/cron.spec.ts — E2E-UI-10: cron UI suite — full functional.
+// tests/ui/cron.spec.ts - E2E-UI-10: cron UI suite - full functional.
 //
 // Full lifecycle: overview → summary; jobs → list; schedules → list.
 
@@ -16,7 +16,7 @@ import { cliDo, cliCall, assertCliOk } from '../../fixtures/cli.js';
 
 
 test.describe.configure({ mode: 'serial' });
-test.describe('UI — cron (full functional)', () => {
+test.describe('UI - cron (full functional)', () => {
   let context: BrowserContext; let page: Page; let strict: StrictPage;
   let orgId: string; let envId: string;
   test.beforeAll(async ({ browser }) => {
@@ -29,7 +29,7 @@ test.describe('UI — cron (full functional)', () => {
   });
   test.afterAll(async () => { await context?.close(); });
 
-  test('cron/overview — render, summary cards', async () => {
+  test('cron/overview - render, summary cards', async () => {
     await navigateToDashPage(page, 'cron', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -41,7 +41,7 @@ test.describe('UI — cron (full functional)', () => {
     assertCliOk(r, 'cron overview (CLI verify)');
   });
 
-  test('cron/jobs — list job runs', async () => {
+  test('cron/jobs - list job runs', async () => {
     await navigateToDashPage(page, 'cron', 'jobs', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -53,7 +53,7 @@ test.describe('UI — cron (full functional)', () => {
     assertCliOk(r, 'cron jobs (CLI verify)');
   });
 
-  test('cron/schedules — list schedules', async () => {
+  test('cron/schedules - list schedules', async () => {
     await navigateToDashPage(page, 'cron', 'schedules', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     await waitForFlutterContent(page);
@@ -69,14 +69,14 @@ test.describe('UI — cron (full functional)', () => {
   // Phase 3: Full functional CRUD test (E2E-UI-Full-8)
   // ════════════════════════════════════════════════════════════════════
 
-  test('cron/schedules — create schedule, verify in UI + CLI', async () => {
+  test('cron/schedules - create schedule, verify in UI + CLI', async () => {
     const domain = `e2e-${RUN_ID}`;
     const schedulesUrl = `${URLs.dash}/#/sentin8-cron/schedules?env=${envId}`;
 
     // Create schedule via UI form (like a human: click Create Schedule, fill
     // fields, submit). The target_config carries the proxy-back contract the
     // create-time validation enforces (cron DESIGN §3, WARN-22): a
-    // non-empty `baseUrl` — the executor dials `{baseUrl}{internalPath}/schedules/run`.
+    // non-empty `baseUrl` - the executor dials `{baseUrl}{internalPath}/schedules/run`.
     await rfwCreateViaForm(page, schedulesUrl, 'Create Schedule', [
       { label: 'Domain', value: domain },
       { label: 'Cron Expression', value: '*/5 * * * *' },

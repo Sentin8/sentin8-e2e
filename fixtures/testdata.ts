@@ -3,18 +3,18 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// fixtures/testdata.ts — shared test data (URLs, personas).
+// fixtures/testdata.ts - shared test data (URLs, personas).
 //
 // Platform-scoped: sentin8/ workspace only (no verticals).
 //
 // Every URL derives from DOMAIN, which comes from the tree-root `.env`
-// (the same file the fleet boots from) via fixtures/env.ts — no
+// (the same file the fleet boots from) via fixtures/env.ts - no
 // hardcoded fallback (e2e DESIGN §4, invariant 5).
 import { platformDomain } from './env.js';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-/** Sentin8 platform root domain (from `SENTIN8_DOMAIN` — required). */
+/** Sentin8 platform root domain (from `SENTIN8_DOMAIN` - required). */
 export const DOMAIN = platformDomain();
 
 // ── Service URLs ──────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ function loadPersistedRunId(): string | undefined {
     const raw = JSON.parse(readFileSync(join(process.cwd(), '.tmp', 'run-id.json'), 'utf-8')) as { runId?: string };
     if (typeof raw.runId === 'string' && raw.runId.length > 0) _runId = raw.runId;
   } catch {
-    // No persisted run id (or unreadable) — fall back to generating one.
+    // No persisted run id (or unreadable) - fall back to generating one.
   }
   return _runId;
 }
@@ -105,8 +105,8 @@ export const Personas: Record<'admin', Persona> = {
  * Resolution order: an explicit `SENTIN8_CLI_BIN` → else derived from the
  * tree root (`SENTIN8_REPO_ROOT`, already resolved by fixtures/env.ts):
  * `{repo_root}/sentin8/sentin8-cli/target/{profile}/sentin8-cli`, where
- * `profile` is `SENTIN8_CLI_PROFILE` (default `debug` — the documented dev
- * pipeline builds debug) — with release tried as the fallback so a
+ * `profile` is `SENTIN8_CLI_PROFILE` (default `debug` - the documented dev
+ * pipeline builds debug) - with release tried as the fallback so a
  * release-only tree works too. No operator-absolute paths: the suite must
  * run on any checkout.
  */
@@ -123,7 +123,7 @@ function resolveCliBin(): string {
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate;
   }
-  // Nothing built yet — return the primary candidate so the spawn error
+  // Nothing built yet - return the primary candidate so the spawn error
   // names the expected path (fail loud, not silently at a wrong absolute).
   return candidates[0];
 }

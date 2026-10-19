@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/ui/storage.spec.ts — E2E-UI-7: storage UI suite — full functional.
+// tests/ui/storage.spec.ts - E2E-UI-7: storage UI suite - full functional.
 //
 // Full lifecycle through the Dash UI:
 //   - overview → render, quota summary
@@ -22,7 +22,7 @@ import { tmpdir } from 'node:os';
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('UI — storage (full functional)', () => {
+test.describe('UI - storage (full functional)', () => {
   let context: BrowserContext;
   let page: Page;
   let strict: StrictPage;
@@ -40,7 +40,7 @@ test.describe('UI — storage (full functional)', () => {
 
   test.afterAll(async () => { await context?.close(); });
 
-  test('storage/overview — render, quota summary', async () => {
+  test('storage/overview - render, quota summary', async () => {
     await navigateToDashPage(page, 'storage', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     const texts = await getFlutterTexts(page);
@@ -52,7 +52,7 @@ test.describe('UI — storage (full functional)', () => {
     assertCliOk(r, 'storage overview (CLI verify)');
   });
 
-  test('storage/buckets — file browser, upload file, verify', async () => {
+  test('storage/buckets - file browser, upload file, verify', async () => {
     await navigateToDashPage(page, 'storage', 'buckets', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
 
@@ -78,7 +78,7 @@ test.describe('UI — storage (full functional)', () => {
     assertCliOk(r, 'storage buckets (CLI verify)');
   });
 
-  test('storage/settings — render', async () => {
+  test('storage/settings - render', async () => {
     await navigateToDashPage(page, 'storage', 'settings', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
     strict.assertNoFailures();
@@ -89,10 +89,10 @@ test.describe('UI — storage (full functional)', () => {
   });
 
   // ════════════════════════════════════════════════════════════════════
-  // Phase 3: Full functional CRUD test — create bucket + upload file
+  // Phase 3: Full functional CRUD test - create bucket + upload file
   // ════════════════════════════════════════════════════════════════════
 
-  test('storage/buckets — create bucket, upload file, verify in UI + CLI', async () => {
+  test('storage/buckets - create bucket, upload file, verify in UI + CLI', async () => {
     const bucketName = `e2e-bucket-${RUN_ID}`;
     const bucketsUrl = `${URLs.dash}/#/storage/buckets?env=${envId}`;
 

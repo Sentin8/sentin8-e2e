@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:E2E
 // SPDX-License-Identifier: Apache-2.0
 
-// tests/cli/_setup.ts — shared setup for CLI suites.
+// tests/cli/_setup.ts - shared setup for CLI suites.
 //
 // Signs in the CLI once (headless device-flow or direct token write),
 // then all suites reuse the stored credentials. This runs as a
@@ -14,17 +14,17 @@ import { resetState } from '../../fixtures/state.js';
 
 let _signedIn = false;
 
-/** System env (ops) — matches Sentin8Config's own fallback for platform-scoped commands. */
+/** System env (ops) - matches Sentin8Config's own fallback for platform-scoped commands. */
 const SYS_ENV = '00000000-0000-0000-0000-000000000002';
 
 /**
  * Provision the CLI's event-producer M2M workload (bus DESIGN §4.3
- * CLI-producer path): the VDC-2 gate is M2M-only — produce carries the
+ * CLI-producer path): the VDC-2 gate is M2M-only - produce carries the
  * workload's `vertical` claim (stamped from the `auth.m2m_scope_grants`
  * row at token mint) and rejects the operator's USER token (no claim).
  * The row is the same declarative shape every service's `m2m_grants`
  * produces; the DCR scope gate requires it before the workload registers.
- * Idempotent upsert, seeded via the operator DSN — the SAME fixture
+ * Idempotent upsert, seeded via the operator DSN - the SAME fixture
  * discipline as the Rust test harness (superuser DSN for SEEDING, never
  * for what the test exercises).
  */
@@ -58,7 +58,7 @@ export async function ensureSignedIn(): Promise<void> {
   if (_signedIn) return;
   await resetState();
   await cliSignIn();
-  // Pin the default env once (idempotent — no-op if already set).
+  // Pin the default env once (idempotent - no-op if already set).
   const cfg = await runCli(['config', 'get', 'default_env_id']);
   if (!cfg.stdout.includes(SYS_ENV)) {
     await runCli(['config', 'set', 'default_env_id', SYS_ENV]);
