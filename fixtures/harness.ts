@@ -1228,23 +1228,49 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
   logStep(`[step] signInToDash: signing in ${email}`);
   await waitForFlutterText(page, 'Sign in', 2_000);
   await clickFlutterButton(page, 'Sign in');
-  await waitForURLContains(page, '/sign-in', 2_000);
-  await waitForFlutterSemantics(page, 2_000);
-  await typeFlutterField(page, 'Email', email);
-  await page.waitForTimeout(300);
-  await typeFlutterField(page, 'Password', password);
-  await page.waitForTimeout(300);
-  // Clear rate limits again right before submitting - the form took
-  // a few seconds to fill, and a previous test's sign-in may have
-  // incremented the counter in that window.
-  clearAuthRateLimits(email);
-  // Submit the form by clicking the "Continue" button (same as signInOnAuth8).
-  await clickFlutterButton(page, 'Continue', true);
-  await page.waitForTimeout(500);
-  // Wait for redirect chain: /sign-in → /oauth/authorize → /auth/callback → dash
+  // The authorize step routes by client consent mode (auth DESIGN §9a.8):
+  // consent-gated clients land on the Flutter `/sign-in` SPA; consent-bypass
+  // first-party clients (e.g. dash) land on the server-rendered HTML login
+  // form at `/oauth/login` (the OIDF-suite-drivable surface). Poll for
+  // whichever surface actually renders - the redirect chain (BFF /auth/login →
+  // /oauth/authorize → terminal page) must settle first.
+  const htmlFormDeadline = Date.now() + 10_000;
+  let isHtmlForm = false;
+  while (Date.now() < htmlFormDeadline) {
+    if ((await page.locator('#username').count()) > 0) {
+      isHtmlForm = true;
+      break;
+    }
+    if ((await page.locator('flt-semantics').count()) > 0) {
+      break;
+    }
+    await page.waitForTimeout(200);
+  }
+  if (isHtmlForm) {
+    // HTML form (auth DESIGN §9a.8): stable ids #username/#password/#submit.
+    await page.locator('#username').fill(email);
+    await page.locator('#password').fill(password);
+    clearAuthRateLimits(email);
+    await page.locator('#submit').click();
+  } else {
+    await waitForFlutterSemantics(page, 2_000);
+    await typeFlutterField(page, 'Email', email);
+    await page.waitForTimeout(300);
+    await typeFlutterField(page, 'Password', password);
+    await page.waitForTimeout(300);
+    // Clear rate limits again right before submitting - the form took
+    // a few seconds to fill, and a previous test's sign-in may have
+    // incremented the counter in that window.
+    clearAuthRateLimits(email);
+    // Submit the form by clicking the "Continue" button (same as signInOnAuth8).
+    await clickFlutterButton(page, 'Continue', true);
+    await page.waitForTimeout(500);
+  }
+  // Wait for redirect chain: /sign-in|/oauth/login → /oauth/authorize →
+  // /auth/callback → dash
   const deadline = Date.now() + 4_000;
   while (Date.now() < deadline) {
-    if (!page.url().includes('/sign-in')) {
+    if (!page.url().includes('/sign-in') && !page.url().includes('/oauth/login')) {
       await page.goto(URLs.dash, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(500);
       return;
