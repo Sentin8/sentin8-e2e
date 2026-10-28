@@ -1241,10 +1241,29 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
       isHtmlForm = true;
       break;
     }
-    if ((await page.locator('flt-semantics').count()) > 0) {
+    // SSO-COOKIE race (dsh-...-zcty26 class): after a signup the browser
+    // holds a fresh auth session - clicking "Sign in" rides
+    // authorize → callback → dash home WITHOUT ever rendering an auth
+    // form. The `flt-semantics` count is 1+ on DASH ITSELF (the SPA was
+    // never navigated away) and on auth's SPA alike, so counting semantics
+    // cannot discriminate. Only the AUTH page has fields (HTML #username or
+    // a *textbox* semantic node); a dash-side semantics node (no textbox,
+    // no #username) means navigation has not left dash yet - keep waiting.
+    if ((await page.locator('#username, input[aria-label="Email"], input[aria-label="Password"], flt-semantics[role="textbox"]').count()) > 0) {
       break;
     }
     await page.waitForTimeout(200);
+  }
+  // SSO-COOKIE auto-login (see the race note above): with a fresh auth
+  // session the full chain (authorize → callback → dash) completes without
+  // ever rendering an auth form - the deadline expired with the browser
+  // back on dash. Treat that as signed-in (the caller's storage state now
+  // carries the session) instead of hunting a field that will never exist.
+  if (!isHtmlForm && page.url().startsWith(URLs.dash)) {
+    if (await isDashSignedIn(page)) {
+      logStep(`[step] signInToDash: SSO-cookie auto-login completed for ${email}`);
+      return;
+    }
   }
   if (isHtmlForm) {
     // HTML form (auth DESIGN §9a.8): stable ids #username/#password/#submit.
