@@ -31,7 +31,7 @@ test.describe('CLI - bus (full functional)', () => {
   // ── Full produce → consume → ack round-trip ──
   test('bus produce → consume → ack round-trip', async () => {
     const streamFamily = `e2e-test-${RUN_ID}`;
-    // VDC-2 (bus DESIGN §4.3): the event type's FIRST segment = the owning
+    // (bus DESIGN §4.3): the event type's FIRST segment = the owning
     // vertical, matched against the producer's M2M `vertical` claim. The
     // CLI-driven produce rides the cli-producer M2M workload (vertical
     // 'sentin8'), so the event must carry the platform vertical -

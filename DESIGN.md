@@ -78,7 +78,7 @@ graph TD
 ## 6. Open Questions
 
 - Fleet-plane journeys (a provisioned machine's smoke via UI surfaces)
-  track backlog FLEET-6's docker-macvlan scenario.
+  carry the docker-macvlan scenario.
 
 ---
 

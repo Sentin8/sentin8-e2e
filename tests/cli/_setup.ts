@@ -19,7 +19,7 @@ const SYS_ENV = '00000000-0000-0000-0000-000000000002';
 
 /**
  * Provision the CLI's event-producer M2M workload (bus DESIGN §4.3
- * CLI-producer path): the VDC-2 gate is M2M-only - produce carries the
+ * CLI-producer path): the gate is M2M-only - produce carries the
  * workload's `vertical` claim (stamped from the `auth.m2m_scope_grants`
  * row at token mint) and rejects the operator's USER token (no claim).
  * The row is the same declarative shape every service's `m2m_grants`

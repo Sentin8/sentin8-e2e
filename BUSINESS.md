@@ -36,7 +36,7 @@ the business's release gate. The value it delivers:
 |---|---|
 | Backend unit/integration coverage | each service repo's Rust suites |
 | Load/performance measurements | Sentin8:Stat + dedicated bench targets |
-| Fleet provisioning proof (docker E2E) | backlog FLEET-6 (captain's module kit) |
+| Fleet provisioning proof (docker E2E) | the captain's module kit (design) |
 | Test-state databases | none exist by rule - the UI/API is the only state builder |
 
 ## 3. Business Capabilities
@@ -101,7 +101,7 @@ release gate's signal.
 
 ## 10. Open Business Questions
 
-- Fleet-plane UI journeys (multi-host status views) land with FLEET-7's
+- Fleet-plane UI journeys (multi-host status views) land with's
   status polish.
 - Cross-browser matrix breadth (beyond the default) follows deployment
   browser telemetry.

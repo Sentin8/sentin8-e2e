@@ -75,7 +75,7 @@ test.describe('UI - cron (full functional)', () => {
 
     // Create schedule via UI form (like a human: click Create Schedule, fill
     // fields, submit). The target_config carries the proxy-back contract the
-    // create-time validation enforces (cron DESIGN §3, WARN-22): a
+    // create-time validation enforces (cron DESIGN §3,): a
     // non-empty `baseUrl` - the executor dials `{baseUrl}{internalPath}/schedules/run`.
     await rfwCreateViaForm(page, schedulesUrl, 'Create Schedule', [
       { label: 'Domain', value: domain },

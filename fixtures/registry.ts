@@ -74,7 +74,7 @@ async function loadRegistry(): Promise<RegistryData> {
   // The registry mirror lives in the sentin8/ group repo - resolved from
   // the tree root (SENTIN8_REPO_ROOT override → tree-root resolution in
   // fixtures/env.ts), never a hardcoded absolute path (defect class:
-  // /home/<user> literals - RS-13).
+  // /home/<user> literals -).
   const registryPath = join(
     process.env.SENTIN8_REPO_ROOT ?? treeRoot(),
     'sentin8',
