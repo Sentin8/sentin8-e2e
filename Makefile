@@ -31,5 +31,6 @@ test-cli: ## CLI suites
 report: ## Open the Playwright HTML report
 	@pnpm exec playwright show-report
 
-clean: ## Remove node_modules + reports
+clean: ## Remove node_modules + reports + run artifacts
 	@rm -rf node_modules test-results playwright-report
+	@rm -rf .run .run/logs .tmp
