@@ -37,7 +37,11 @@ graph TD
 ## 3. Test Data Lifecycle
 
 1. **Clean state**: tests assume a booted platform (captain fleet + PG +
-   Valkey); no fixture mutates the DB.
+   Valkey); no fixture mutates the DB. The CLI's M2M workload rows
+   (`cli-producer` etc.) are NOT fixture state - the platform's
+   provision-on-boot pass converges them from the CLI's own
+   `--print-registration` declaration (CLI DESIGN §4.2); after a
+   `dev-destroy` reset a plain `make start` restores them.
 2. **State construction**: every prerequisite is a real flow - sign-up,
    create org, create env, enable feature, assign role through UI.
 3. **Teardown**: browser contexts are per-test; durable test artifacts

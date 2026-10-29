@@ -29,11 +29,9 @@
   "devDependencies": {
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.0",
-    "@types/pg": "^8.23.1",
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "pg": "^8.23.1",
     "pnpm": "^12.3.4"
   }
 }

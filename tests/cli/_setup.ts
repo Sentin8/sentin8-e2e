@@ -18,41 +18,18 @@ let _signedIn = false;
 const SYS_ENV = '00000000-0000-0000-0000-000000000002';
 
 /**
- * Provision the CLI's event-producer M2M workload (bus DESIGN §4.3
- * CLI-producer path): the gate is M2M-only - produce carries the
- * workload's `vertical` claim (stamped from the `auth.m2m_scope_grants`
- * row at token mint) and rejects the operator's USER token (no claim).
- * The row is the same declarative shape every service's `m2m_grants`
- * produces; the DCR scope gate requires it before the workload registers.
- * Idempotent upsert, seeded via the operator DSN - the SAME fixture
- * discipline as the Rust test harness (superuser DSN for SEEDING, never
- * for what the test exercises).
- */
-async function seedCliProducerGrant(): Promise<void> {
-  const pg = await import('pg');
-  const client = new pg.Client({
-    connectionString: process.env.DATABASE_URL || 'postgres://sentin8:sentin8@localhost:5432/sentin8',
-  });
-  await client.connect();
-  try {
-    await client.query(
-      `INSERT INTO auth.m2m_scope_grants (service_name, allowed_scopes, vertical, service_type)
-       VALUES ('cli-producer', '{sentin8:bus:produce}', 'sentin8', 'sentin8:cli')
-       ON CONFLICT (service_name) DO UPDATE SET
-         allowed_scopes = EXCLUDED.allowed_scopes,
-         vertical = EXCLUDED.vertical,
-         service_type = EXCLUDED.service_type`,
-    );
-  } finally {
-    await client.end();
-  }
-}
-
-/**
  * Ensure the CLI is signed in before any CLI suite runs.
  * Also pins `default_env_id` to the system env: admin endpoints
  * (`/v1/admin/...`) reject calls without `--env` when no default env
  * is configured, and the bidirectional suites call them bare.
+ *
+ * The CLI's M2M workload grant rows (`cli-producer` etc.) are NOT seeded
+ * here - they are declarative enrollment data (`sentin8-cli
+ * --print-registration --section=m2m_grants`, upserted by
+ * `vertical enroll ../sentin8-cli`). Direct database access in fixtures is
+ * banned by the suite's defining constraint (DESIGN.md §1) and the platform
+ * DB has been certificate-identity-only since PGMTLS-1 (a password DSN
+ * cannot connect at all - the 2026-10-29 bidirectional-suite break).
  */
 export async function ensureSignedIn(): Promise<void> {
   if (_signedIn) return;
@@ -63,10 +40,6 @@ export async function ensureSignedIn(): Promise<void> {
   if (!cfg.stdout.includes(SYS_ENV)) {
     await runCli(['config', 'set', 'default_env_id', SYS_ENV]);
   }
-  // The producer workload grant must exist before any bus produce test
-  // (the CLI's gate-triggered fallback DCRs 'cli-producer', which the
-  // DCR scope gate rejects without the row).
-  await seedCliProducerGrant();
   _signedIn = true;
 }
 

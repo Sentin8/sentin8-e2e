@@ -30,7 +30,14 @@ test.describe('CLI - cron (full functional)', () => {
     // Standard 5-field cron (cron design §4.2a): minute hour dom month dow.
     // A 6-field (seconds-inclusive) expression is rejected with 400.
     const cronExpr = '*/5 * * * *';
-    const targetConfig = JSON.stringify({ handler: 'e2e_test_handler', url: 'https://e2e.example.com' });
+    // Create-time target validation (cron DESIGN §3): target_config must
+    // carry a non-empty `baseUrl` - the ticker rejects configs it could
+    // never proxy (the 2026-10-29 e2e break: the fixture payload used the
+    // retired `url` field and every create 400'd).
+    const targetConfig = JSON.stringify({
+      handler: 'e2e_test_handler',
+      baseUrl: 'https://e2e.example.com',
+    });
 
     // 1. Create a real schedule
     const r1 = await cliDo('cron', 'schedule', 'create', {
