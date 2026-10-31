@@ -327,10 +327,11 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
   // 2. Approve the device code via browser sign-in
   await approveDeviceViaBrowser(deviceData.verification_uri_complete, email, password);
 
-  // 3. Poll for the token - poll immediately, then every 1 second.
+  // 3. Poll for the token - RFC 8628 §3.5: poll no faster than the
+  // server-returned `interval`; each `slow_down` answer adds +5s.
   const startTime = Date.now();
   const maxWait = (deviceData.expires_in ?? 900) * 1000;
-  const pollInterval = 1000; // 1 second (faster than server's suggested 5s)
+  let pollInterval = (deviceData.interval ?? 5) * 1000;
 
   while (Date.now() - startTime < maxWait) {
     await sleep(pollInterval);
@@ -354,13 +355,18 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
     };
 
     // RFC 8628 §3.5 - only `authorization_pending` and `slow_down` mean
-    // "keep polling". Any other error is terminal: fail fast (with the
-    // server's error_description when present) instead of looping to the
+    // "keep polling"; `slow_down` mandates a +5s interval increase. Any
+    // other error is terminal: fail fast (with the server's
+    // error_description when present) instead of looping to the
     // 15-minute device-code expiry.
     const POLLABLE = new Set(['authorization_pending', 'slow_down']);
     if (tokenData.error && !POLLABLE.has(tokenData.error)) {
       const desc = (tokenData as { error_description?: string }).error_description ?? '';
       throw new Error(`Device token poll failed: ${tokenData.error}${desc ? ` - ${desc}` : ''}`);
+    }
+    if (tokenData.error === 'slow_down') {
+      pollInterval += 5000;
+      continue;
     }
 
     if (tokenData.access_token) {
@@ -394,13 +400,8 @@ async function deviceFlowSignIn(email: string, password: string): Promise<void> 
       return;
     }
 
-    if (tokenData.error === 'authorization_pending' || tokenData.error === 'slow_down') {
-      continue;
-    }
-
-    if (tokenData.error === 'expired_token' || tokenData.error === 'access_denied') {
-      throw new Error(`Device flow failed: ${tokenData.error}`);
-    }
+    // authorization_pending - keep polling at the current interval.
+    continue;
   }
 
   throw new Error('Device flow timed out waiting for approval');
@@ -450,14 +451,19 @@ async function approveDeviceViaBrowser(
         await page.waitForTimeout(200);
       }
 
-      const continueBtn = page.getByRole('button', { name: 'Continue', exact: true });
-      if (await continueBtn.count() > 0) {
-        await continueBtn.first().click({ force: true });
-        await page.waitForTimeout(1000);
+      // The device page's sign-in submit ("Sign In") - the decision
+      // (Approve/Deny) is a separate explicit step on the same page.
+      for (const label of ['Sign In', 'Continue']) {
+        const btn = page.getByRole('button', { name: label, exact: true });
+        if (await btn.count() > 0) {
+          await btn.first().click({ force: true });
+          await page.waitForTimeout(1000);
+          break;
+        }
       }
     }
 
-    // 2. After sign-in, look for an approval button.
+    // 2. After sign-in, look for the explicit decision button.
     for (const label of ['Allow', 'Approve', 'Authorize']) {
       const btn = page.getByRole('button', { name: label, exact: true });
       if (await btn.count() > 0) {
