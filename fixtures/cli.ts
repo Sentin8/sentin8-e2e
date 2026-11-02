@@ -268,30 +268,24 @@ export async function cliSignIn(
     // not signed in - proceed
   }
 
-  // Disable TLS verification for the local self-signed CA
-  const prev = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  // TLS trust: verified fetch only - the platform root CA is installed at
+  // the OS level (acme boot install + update-ca-certificates) and the
+  // suite's npm scripts run Node with --use-openssl-ca. The historic
+  // NODE_TLS_REJECT_UNAUTHORIZED=0 flip violated the platform TLS rule
+  // (no code-level verification bypass, ever).
 
-  try {
-    // Step 1: Sign up the user via CLI (idempotent - OK if already exists).
-    const signupResult = await runCli([
-      'signup', '--email', email, '--password', password,
-      '--first-name', 'Test', '--last-name', 'Operator',
-    ]);
-    // exit 0 = created, non-zero = already exists (both are OK).
+  // Step 1: Sign up the user via CLI (idempotent - OK if already exists).
+  const signupResult = await runCli([
+    'signup', '--email', email, '--password', password,
+    '--first-name', 'Test', '--last-name', 'Operator',
+  ]);
+  // exit 0 = created, non-zero = already exists (both are OK).
 
-    // Step 2-5: Browser-assisted device flow.
-    // Clear auth rate limits first - the device flow browser sign-in
-    // counts against the rate limiter.
-    clearAuthRateLimits(email);
-    await deviceFlowSignIn(email, password);
-  } finally {
-    if (prev === undefined) {
-      delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-    } else {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = prev;
-    }
-  }
+  // Step 2-5: Browser-assisted device flow.
+  // Clear auth rate limits first - the device flow browser sign-in
+  // counts against the rate limiter.
+  clearAuthRateLimits(email);
+  await deviceFlowSignIn(email, password);
 }
 
 /** Full device-flow: request code → browser sign-in + approve → poll → write credentials. */

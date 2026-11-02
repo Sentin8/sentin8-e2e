@@ -11,8 +11,11 @@
 // Each test file creates its own browser context but reuses the
 // storage state (cookies) - no sign-in needed.
 
-// Allow self-signed certs for local dev.
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+// TLS trust: verified only - the platform root CA is installed at the OS
+// level (acme boot install + update-ca-certificates) and the suite's npm
+// scripts run Node with --use-openssl-ca. No code-level verification
+// bypass, ever: a rejected cert is a provisioning defect fixed at the
+// OS trust store.
 
 import { type Page, type BrowserContext } from '@playwright/test';
 import { readFileSync, existsSync } from 'node:fs';

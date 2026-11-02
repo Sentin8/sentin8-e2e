@@ -35,7 +35,9 @@ export async function globalSetup(): Promise<void> {
   if (_done) return;
   _done = true;
 
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  // TLS trust: verified only - the platform root CA is installed at the
+  // OS level and Node runs with --use-openssl-ca (npm scripts). No
+  // code-level verification bypass, ever.
 
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
