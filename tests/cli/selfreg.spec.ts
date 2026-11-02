@@ -130,8 +130,8 @@ test.describe('SELFREG: --print-registration --section=admin_scopes', () => {
 // ── Section: audit_findings + service_actions ─────────────────────────
 
 test.describe('SELFREG: --print-registration --section=audit_findings', () => {
-  test('bank8-fdx has audit findings', () => {
-    const binaryPath = path.join(SENTRY8_ROOT, 'bank8/bank8-fdx/target/release/bank8-fdx');
+  test('openfin8-ca has audit findings', () => {
+    const binaryPath = path.join(SENTRY8_ROOT, 'openfin8/openfin8-ca/target/release/openfin8-ca');
     if (!fs.existsSync(binaryPath)) {
       test.skip(true, 'binary not built');
       return;
@@ -156,8 +156,8 @@ test.describe('SELFREG: --print-registration --section=audit_findings', () => {
 });
 
 test.describe('SELFREG: --print-registration --section=service_actions', () => {
-  test('bank8-fdx has service actions', () => {
-    const binaryPath = path.join(SENTRY8_ROOT, 'bank8/bank8-fdx/target/release/bank8-fdx');
+  test('openfin8-ca has service actions', () => {
+    const binaryPath = path.join(SENTRY8_ROOT, 'openfin8/openfin8-ca/target/release/openfin8-ca');
     if (!fs.existsSync(binaryPath)) {
       test.skip(true, 'binary not built');
       return;

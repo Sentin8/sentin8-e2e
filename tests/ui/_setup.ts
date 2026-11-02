@@ -90,7 +90,7 @@ export async function navigateToDashPage(
     'sentin8:db': 'DB', 'sentin8:flow': 'Flow', 'sentin8:func': 'Func',
     'sentin8:post': 'Post', 'sentin8:stat': 'Stat', 'sentin8:storage': 'Storage',
     'sentin8:sys': 'System', 'sentin8:app': 'App', 'sentin8:acme': 'Acme',
-    'bank8:ledger': 'Ledger', 'bank8:fdx': 'FDX', 'bank8:payments': 'Payments',
+    'bank8:ledger': 'Ledger', 'openfin8:ca': 'Open Banking', 'bank8:payments': 'Payments',
     'hotel8:pms': 'PMS', 'hotel8:pos': 'POS', 'hotel8:loyalty': 'Loyalty',
     'hotel8:meta': 'Meta', 'hotel8:distrib': 'Distrib', 'hotel8:upsell': 'Upsell',
     // Legacy hyphen aliases
@@ -98,7 +98,7 @@ export async function navigateToDashPage(
     'sentin8-db': 'DB', 'sentin8-flow': 'Flow', 'sentin8-func': 'Func',
     'sentin8-post': 'Post', 'sentin8-stat': 'Stat', 'sentin8-storage': 'Storage',
     'sentin8-sys': 'System', 'sentin8-app': 'App', 'sentin8-acme': 'Acme',
-    'bank8-ledger': 'Ledger', 'bank8-fdx': 'FDX', 'bank8-payments': 'Payments',
+    'bank8-ledger': 'Ledger', 'openfin8-ca': 'Open Banking', 'bank8-payments': 'Payments',
     'hotel8-pms': 'PMS', 'hotel8-pos': 'POS', 'hotel8-loyalty': 'Loyalty',
     'hotel8-meta': 'Meta', 'hotel8-distrib': 'Distrib', 'hotel8-upsell': 'Upsell',
     // Short forms (fallback)
