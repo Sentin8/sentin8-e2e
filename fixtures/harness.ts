@@ -1273,7 +1273,12 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
     await page.locator('#submit').click();
   } else {
     await waitForFlutterSemantics(page, 2_000);
+    // Identifier-first two-step fill (IDFIRST-1): email → Continue →
+    // wait for the password field → password → Sign in.
     await typeFlutterField(page, 'Email', email);
+    await page.waitForTimeout(300);
+    await clickFlutterButton(page, 'Continue', true);
+    await waitForFlutterText(page, 'Password', 4_000);
     await page.waitForTimeout(300);
     await typeFlutterField(page, 'Password', password);
     await page.waitForTimeout(300);
@@ -1281,8 +1286,8 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
     // a few seconds to fill, and a previous test's sign-in may have
     // incremented the counter in that window.
     clearAuthRateLimits(email);
-    // Submit the form by clicking the "Continue" button (same as signInOnAuth8).
-    await clickFlutterButton(page, 'Continue', true);
+    // Submit the credential step (exact match - never "Sign in with passkey").
+    await clickFlutterButton(page, 'Sign in', true);
     await page.waitForTimeout(500);
   }
   // Wait for redirect chain: /sign-in|/oauth/login → /oauth/authorize →
@@ -1439,16 +1444,21 @@ export async function signInOnAuth8(page: Page, email: string, password: string)
   clearAuthRateLimits(email);
   logStep(`[step] signInOnAuth8: signing in ${email}`);
   await waitForFlutterSemantics(page, 2_000);
-  // Wait for the sign-in form to be ready before typing.
+  // Identifier-first sign-in (IDFIRST-1): step 1 collects the email,
+  // then the credential step renders. Fill the email, submit, wait for
+  // the password field, fill it, and submit again.
   await waitForFlutterText(page, 'Email', 2_000);
   await page.waitForTimeout(500);
   await typeFlutterField(page, 'Email', email);
   await page.waitForTimeout(300);
+  await clickFlutterButton(page, 'Continue', true);
+  await waitForFlutterText(page, 'Password', 4_000);
+  await page.waitForTimeout(300);
   await typeFlutterField(page, 'Password', password);
   await page.waitForTimeout(300);
-  // Submit the form by clicking the "Continue" button. Use exact matching
-  // to avoid clicking "Continue with SSO".
-  await clickFlutterButton(page, 'Continue', true);
+  // Submit the credential step (button label is "Sign in" now - keep
+  // the exact match so "Sign in with passkey" is never clicked).
+  await clickFlutterButton(page, 'Sign in', true);
   // Wait for the sign-in API response (Set-Cookie + OAuth callback redirect).
   await page.waitForTimeout(500);
 }
