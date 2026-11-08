@@ -21,7 +21,20 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 /** Variables read from the tree root `.env` by this suite. */
-const DOTENV_VARS = ['SENTIN8_DOMAIN', 'SENTIN8_REPO_ROOT', 'SENTIN8_CLI_BIN'] as const;
+const DOTENV_VARS = [
+  'SENTIN8_DOMAIN',
+  'SENTIN8_REPO_ROOT',
+  'SENTIN8_CLI_BIN',
+  // Fleet TLS posture (DESIGN §4 invariant 7): the CLI is a rustls
+  // client whose key-exchange offer must match the fleet's posture -
+  // runCli children inherit these from process.env. Without them a
+  // classical-postured fleet rejects the CLI's default PQ offer with
+  // a silent connect error (the device-flow persona never signs up).
+  'SENTIN8_TLS_PQ_MODE',
+  'SENTIN8_TLS_CIPHER_PROFILE',
+  'SENTIN8_TLS_CLIENT_AUTH',
+  'SENTIN8_MTLS_CLIENT_AUTH',
+] as const;
 
 function repoRoot(): string {
   // Explicit operator override → then resolve from THIS module's location:

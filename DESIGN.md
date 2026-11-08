@@ -70,6 +70,18 @@ graph TD
    invariant 5). A hard-coded operator-absolute path is the same defect
    class as a hard-coded domain: it dies with `spawn ENOENT` on any other
    checkout or profile.
+7. **CLI subprocesses inherit the fleet's TLS posture** - the CLI is a
+   rustls client whose key-exchange offer must match the fleet's
+   `SENTIN8_TLS_PQ_MODE` (the same tree-root `.env` the fleet is booted
+   from, invariant 5). `runCli` injects the fleet TLS posture vars into
+   every CLI child; without them a classical-postured fleet rejects the
+   CLI's default PQ offer with a TLS `HandshakeFailure` - the CLI's
+   `signup`/`call` fail as connection errors with no HTTP trace, and
+   the fixture's "idempotent signup" silently leaves the persona
+   nonexistent (the device flow then 401s its approval sign-in and
+   times out). The suite's own `process.env` is NOT the channel: the
+   operator's Playwright process is not a fleet boot and carries none
+   of the fleet env.
 
 ## 5. Testing Strategy (of this repo)
 
