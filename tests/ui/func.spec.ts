@@ -33,6 +33,7 @@ test.describe('UI - func (full functional)', () => {
   test('func/overview - render, summary cards', async () => {
     await navigateToDashPage(page, 'func', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
+    await waitForFlutterContent(page);
     const texts = await getFlutterTexts(page);
     expect(texts.length).toBeGreaterThan(0);
     strict.assertNoFailures();
@@ -45,7 +46,10 @@ test.describe('UI - func (full functional)', () => {
   test('func/versions - list module versions', async () => {
     await navigateToDashPage(page, 'func', 'versions', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
-    // Versions page may be empty (no modules uploaded) - that's OK.
+    // Versions page may be empty (no modules uploaded) - that's OK;
+    // settle the page shell first so an admin-UI fetch failure is
+    // caught here rather than racing past it (DESIGN.md §4 inv. 8).
+    await waitForFlutterContent(page);
     strict.assertNoFailures();
 
     // CLI verify: func modules admin data is accessible.

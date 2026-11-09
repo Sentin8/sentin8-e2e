@@ -82,6 +82,18 @@ graph TD
    times out). The suite's own `process.env` is NOT the channel: the
    operator's Playwright process is not a fleet boot and carries none
    of the fleet env.
+8. **Semantics presence is not content presence** - `waitForFlutterSemantics`
+   only waits for the FIRST `flt-semantics` node to exist (the shell:
+   sidebar, breadcrumbs, header). RFW page content (the service's admin
+   cards/tables) lands asynchronously AFTER that, once
+   `GET /v1/admin/ui/{page}` resolves and the canvas paints. Any test
+   that asserts page content must therefore call `waitForFlutterContent`
+   between `waitForFlutterSemantics` and `getFlutterTexts` - harvesting
+   texts immediately after semantics-presence is a race that can return
+   `0` on a slow paint and fail a healthy page. Asserting a page that
+   may legitimately be empty (no rows yet) skips the texts assertion but
+   keeps `waitForFlutterContent` for the page shell, relying on
+   `strict.assertNoFailures()` for API errors.
 
 ## 5. Testing Strategy (of this repo)
 

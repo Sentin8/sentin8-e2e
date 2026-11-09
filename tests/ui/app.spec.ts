@@ -42,6 +42,7 @@ test.describe('UI - app (full functional)', () => {
   test('app/store - list published listings', async () => {
     await navigateToDashPage(page, 'app', 'store', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
+    await waitForFlutterContent(page);
     const texts = await getFlutterTexts(page);
     expect(texts.length).toBeGreaterThan(0);
     // The store page should show either listings or an empty state

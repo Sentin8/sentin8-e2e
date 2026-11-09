@@ -43,6 +43,7 @@ test.describe('UI - storage (full functional)', () => {
   test('storage/overview - render, quota summary', async () => {
     await navigateToDashPage(page, 'storage', 'overview', orgId, envId);
     await waitForFlutterSemantics(page, 10_000);
+    await waitForFlutterContent(page);
     const texts = await getFlutterTexts(page);
     expect(texts.length).toBeGreaterThan(0);
     strict.assertNoFailures();
