@@ -275,11 +275,26 @@ export async function cliSignIn(
   // (no code-level verification bypass, ever).
 
   // Step 1: Sign up the user via CLI (idempotent - OK if already exists).
+  //
+  // Only "already registered" may be ignored. This used to accept ANY
+  // non-zero exit, which discarded real sign-up failures (bad password
+  // policy, auth unreachable, 500) and pushed them into the device flow -
+  // where they surfaced 15 minutes later as "Device flow timed out
+  // waiting for approval". That two-step swallow is why the flow looked
+  // like it failed silently. Match the CLI's own idempotency signal
+  // (auth.rs: "email already registered") and fail loud on anything else.
   const signupResult = await runCli([
     'signup', '--email', email, '--password', password,
     '--first-name', 'Test', '--last-name', 'Operator',
   ]);
-  // exit 0 = created, non-zero = already exists (both are OK).
+  const signupOut = `${signupResult.stdout ?? ''}\n${signupResult.stderr ?? ''}`;
+  const alreadyRegistered = /already registered|already exists/i.test(signupOut);
+  if (signupResult.exitCode !== 0 && !alreadyRegistered) {
+    throw new Error(
+      `cliSignIn: signup failed for ${email} (exit ${signupResult.exitCode}) - ` +
+        `${signupOut.trim().slice(0, 500)}`,
+    );
+  }
 
   // Step 2-5: Browser-assisted device flow.
   // Clear auth rate limits first - the device flow browser sign-in
