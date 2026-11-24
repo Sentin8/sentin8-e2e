@@ -475,6 +475,17 @@ async function approveDeviceViaBrowser(
   // Fallback: if browser didn't find an approval button, approve via API.
   // SEC-2.1.4 - device verification requires a session; the approving
   // user comes from the session token, not the request body.
+  //
+  // DEVICE-APPROVE-LOUD: every step here used to swallow its own failure -
+  // `if (signInResp.ok)` had no `else`, and the `/device/verify` response
+  // was never read. A rejected sign-in or a refused approval therefore left
+  // the code UNapproved, and the only symptom was `deviceFlowSignIn`'s poll
+  // loop spinning for the full `expires_in` (15 min) before reporting a
+  // generic "Device flow timed out waiting for approval". That is the
+  // "device flow fails silently" failure mode: the real cause (wrong
+  // credentials, missing session, `mfa required`, unknown/expired
+  // user_code) is discarded, and the run looks like a hang instead of an
+  // error. Surface both responses verbatim instead.
   if (!approved && userCode) {
     // The hostname header routes the request through the ingress; it is
     // DERIVED from the suite's domain (never a hardcoded literal - e2e
@@ -485,17 +496,41 @@ async function approveDeviceViaBrowser(
       headers: { 'content-type': 'application/json', 'x-sentin8-hostname': authHost },
       body: JSON.stringify({ email, password }),
     });
-    if (signInResp.ok) {
-      const signInData = await signInResp.json() as { user_id: string; token: string };
-      await fetch(`${URLs.auth}/device/verify`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: `Bearer ${signInData.token}`,
-        },
-        body: JSON.stringify({ user_code: userCode }),
-      });
+    if (!signInResp.ok) {
+      throw new Error(
+        `Device approval fallback: sign-in failed for ${email} - ` +
+          `HTTP ${signInResp.status} ${await signInResp.text()}`,
+      );
     }
+    const signInData = await signInResp.json() as { user_id: string; token: string };
+    if (!signInData.token) {
+      throw new Error(
+        'Device approval fallback: sign-in returned no session token - ' +
+          'cannot approve a device code without an active session (SEC-2.1.4).',
+      );
+    }
+    const verifyResp = await fetch(`${URLs.auth}/device/verify`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${signInData.token}`,
+      },
+      body: JSON.stringify({ user_code: userCode }),
+    });
+    // 400 unknown user_code / 401 no|expired|pending_mfa session / 410
+    // expired user_code are all terminal - approve nothing and say why.
+    if (!verifyResp.ok) {
+      throw new Error(
+        `Device approval failed for user_code ${userCode} - ` +
+          `HTTP ${verifyResp.status} ${await verifyResp.text()}`,
+      );
+    }
+  } else if (!approved) {
+    throw new Error(
+      'Device approval failed: the browser flow found no Approve/Allow ' +
+        'control and no user_code was present in the verification URI, so ' +
+        'the API fallback could not run either.',
+    );
   }
 }
 
