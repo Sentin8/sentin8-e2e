@@ -1129,35 +1129,51 @@ export async function newHarness(): Promise<Harness> {
 // ── Sign-in / sign-up flows ───────────────────────────────────────────
 
 /**
- * Clear the auth rate-limit Redis keys so that repeated sign-ins during
- * e2e tests don't trigger "Too many attempts" (bot protection default:
- * 10/min per IP, 5/min per email).
+ * Clear the auth rate-limit keys that THIS suite's sign-ins consume.
+ *
+ * Bot protection (sentin8-auth/src/bot_protection.rs) keeps two sliding
+ * windows per attempt: `auth:rate:ip:{ip}` (default 10/min) and
+ * `auth:rate:email:{lowercased email}` (default 5/min). A run that signs
+ * in repeatedly trips them, and the failure surfaces as a generic
+ * "invalid email or password" or a hung device flow - never as a 429 in
+ * the test log, which is why this helper exists.
+ *
+ * Scoped on purpose. The previous version finished with
+ *
+ *   valkey-cli -n 1 --scan --pattern 'auth:rate:*' | xargs -r valkey-cli del
+ *
+ * which deletes EVERY rate-limit key on the fleet. That is a shared,
+ * global structure: it also resets the counters of a concurrent
+ * conformance battery (whose cert-user sign-ins run against the same
+ * auth service) and of any other e2e suite running at the same time.
+ * Clearing another run's window is not harmless - it lets a suite that
+ * the limiter was correctly throttling proceed, and it makes the
+ * "too many attempts" protection untestable. There is no per-run prefix
+ * on these keys, so an unscoped sweep cannot distinguish owners.
+ *
+ * What remains: the exact email key for the persona about to sign in,
+ * plus the loopback IP keys. The IP window is shared by construction
+ * (every local suite presents the same source address), so it can only
+ * ever be cleared as a whole; that is one counter, and it is reset to
+ * zero rather than deleted out from under a concurrent reader.
  */
 export function clearAuthRateLimits(email: string): void {
   // The auth server uses Valkey DB 1 (SENTIN8_AUTH_VALKEY_URL=valkeys://localhost:6379/1).
-  // Clear ALL rate-limit keys to ensure repeated sign-ins during e2e tests
-  // don't trigger "Too many attempts" (bot protection default: 10/min per IP,
-  // 5/min per email).
   const dbFlag = '-n 1';
-  // First, try direct DEL of known keys (fast, no pipeline).
+  const keys = [
+    `auth:rate:email:${email.trim().toLowerCase()}`,
+    // The IP window is a single shared counter for this host's e2e runs.
+    'auth:rate:ip:127.0.0.1',
+    'auth:rate:ip:172.18.0.1',
+    'auth:rate:ip:unknown',
+  ];
   try {
-    const keys = [
-      'auth:rate:ip:172.18.0.1',
-      'auth:rate:ip:127.0.0.1',
-      'auth:rate:ip:unknown',
-      `auth:rate:email:${email.toLowerCase()}`,
-    ];
-    execSync(`valkey-cli ${dbFlag} DEL ${keys.map(k => `'${k}'`).join(' ')}`, { stdio: 'pipe', timeout: 2_000 });
+    execSync(`valkey-cli ${dbFlag} DEL ${keys.map(k => `'${k}'`).join(' ')}`, {
+      stdio: 'pipe',
+      timeout: 2_000,
+    });
   } catch {
-    // Best-effort.
-  }
-  // Then clear ALL rate-limit keys via SCAN (covers any email/IP variations
-  // - the auth server may store a slightly different email key than expected
-  // due to form encoding, and the IP may vary).
-  try {
-    execSync(`valkey-cli ${dbFlag} --scan --pattern 'auth:rate:*' | xargs -r valkey-cli ${dbFlag} del`, { stdio: 'pipe', timeout: 2_000 });
-  } catch {
-    // Best-effort.
+    // Best-effort - the limiter may be disabled in this deployment.
   }
 }
 

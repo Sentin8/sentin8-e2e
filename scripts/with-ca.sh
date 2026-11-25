@@ -94,6 +94,42 @@ candidate_certs() {
   return 0
 }
 
+# ── Fleet concurrency guard ───────────────────────────────────────────────
+# The e2e suite and the OIDF conformance battery drive ONE fleet. Their data
+# planes are separate (run-scoped orgs vs `conformance-local`), but the auth
+# rate limiter is a single global window per IP/email with no per-run prefix,
+# and a conformance module that parks for ten minutes must not be raced.
+#
+# The battery takes `$TREE_ROOT/.tmp/conformance/run.lock` and refuses to
+# start while a playwright process is live. That guard is one-directional:
+# it cannot stop a battery that started first and an e2e run started second.
+# Taking the SAME file makes the mutual exclusion symmetric.
+#
+# The lock lives HERE, not in the Playwright process, because a lock is
+# released when its holder exits - a worker or global-setup process ends
+# while the run continues. This shell outlives the whole invocation.
+#
+# SENTIN8_E2E_ALLOW_CONCURRENT=1 skips the guard for the case where the
+# operator has verified the running campaign is parked on a module that
+# cannot collide.
+LOCK="$TREE_ROOT/.tmp/conformance/run.lock"
+HELD_LOCK=""
+if [[ "${SENTIN8_E2E_ALLOW_CONCURRENT:-0}" != "1" ]]; then
+  mkdir -p "$(dirname "$LOCK")"
+  # fd 9 is reserved for the lock and stays open until this shell exits.
+  exec 9>"$LOCK"
+  if ! flock -n 9; then
+    echo "[e2e-ts] REFUSING TO START: a conformance battery holds $LOCK." >&2
+    echo "[e2e-ts]   Both suites share the auth rate limiter and the cert-user" >&2
+    echo "[e2e-ts]   state; a mid-flight module can be killed by a rival run." >&2
+    echo "[e2e-ts]   Wait for the battery, or set SENTIN8_E2E_ALLOW_CONCURRENT=1" >&2
+    echo "[e2e-ts]   if you have verified it is parked on a module that cannot collide." >&2
+    exit 1
+  fi
+  HELD_LOCK="yes"
+  echo "[e2e-ts] fleet lock acquired ($LOCK)" >&2
+fi
+
 # ── Assemble one deduplicated PEM bundle ──────────────────────────────────
 BUNDLE_DIR="$SUITE_ROOT/.tmp"
 BUNDLE="$BUNDLE_DIR/ca-bundle.pem"

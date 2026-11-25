@@ -24,6 +24,7 @@ import {
 } from '../../fixtures/harness.js';
 import { cliSignIn, cliCall, assertCliOk, cliRefreshToken } from '../../fixtures/cli.js';
 import { logStep } from '../../fixtures/log.js';
+import { assertFleetIsFree, reportFleetState } from '../../fixtures/concurrency-guard.js';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
@@ -34,6 +35,14 @@ let _done = false;
 export async function globalSetup(): Promise<void> {
   if (_done) return;
   _done = true;
+
+  // Fail before any setup mutation: the fleet is shared with the OIDF
+  // conformance battery, which takes the same tree-local lock. Starting
+  // a run against a live campaign disturbs its auth rate-limit windows
+  // and can get a mid-flight module killed (terminal INTERRUPTED - no
+  // rerun repairs it).
+  assertFleetIsFree();
+  reportFleetState();
 
   // TLS trust: verified only - the platform root CA is installed at the
   // OS level and Node runs with --use-openssl-ca (npm scripts). No
