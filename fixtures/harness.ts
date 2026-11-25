@@ -1218,7 +1218,7 @@ export async function signInToDash(page: Page, context: BrowserContext, email: s
   clearAuthRateLimits(email);
   // Do NOT clear cookies - Playwright's clearCookies() wipes ALL domains,
   // which would destroy unrelated tenant BFF8 sessions. Each app's session
-  // cookie is scoped to its own domain (e.g. bff8.dash.ops.sys.local.sentin8.dev)
+  // cookie is scoped to its own domain (e.g. bff8.dash.ops.sys.${DOMAIN})
   // so they don't conflict. The BFF8 OAuth flow handles session refresh.
   await page.goto(URLs.dash, { waitUntil: 'domcontentloaded' });
   if (await isDashSignedIn(page)) {
@@ -1641,9 +1641,9 @@ export async function signInToTenantAuth8(
     await page.waitForTimeout(500);
   }
   // The browser is now on the app frontend URL (e.g.
-  // prod.ibank.ebank.app8.local.sentin8.dev) with the BFF8 session cookie set.
+  // prod.ibank.ebank.app8.${DOMAIN}) with the BFF8 session cookie set.
   // Wait for the Flutter app to boot. We do NOT navigate back to the
-  // original appURL because it may be a custom domain (e.g. www.ibank.local)
+  // original appURL because it may be a custom domain (e.g. www.ibank.example)
   // that doesn't share the BFF8 session cookie's registrable domain.
   await waitForFlutterSemantics(page, 2_000);
   // Wait for the app to establish the BFF8 session and transition from
@@ -1678,7 +1678,7 @@ export async function signInToTenantAuth8(
  * @param page         Playwright page
  * @param orgSlug      The slug the user typed in the Organization Name
  *                     field. The platform default is `{slug}.o.{domain}`.
- * @param customDomain The desired custom domain, e.g. `iapp.local`.
+ * @param customDomain The desired custom domain, e.g. `iapp.example`.
  */
 export async function setOrgDomainViaUI(
   page: Page,
@@ -1699,7 +1699,7 @@ export async function setOrgDomainViaUI(
   // Wait for the edit-mode TextField to appear. Flutter CanvasKit
   // mounts a new <input> element when the field enters edit mode but
   // its .value is empty until the input receives focus. Poll until we
-  // see a fresh input with placeholder text like "e.g. ibank.local",
+  // see a fresh input with placeholder text like "e.g. ibank.example",
   // then focus it to flush the controller's value into the DOM.
   const editReadyDeadline = Date.now() + 2_000;
   let editReady = false;
@@ -1707,7 +1707,7 @@ export async function setOrgDomainViaUI(
     editReady = await page.evaluate((expected: string) => {
       const inputs = Array.from(document.querySelectorAll('input, textarea'));
       // The edit-mode input is the LAST mounted one; it has an empty
-      // value and a placeholder like "e.g. ibank.local".
+      // value and a placeholder like "e.g. ibank.example".
       for (let i = inputs.length - 1; i >= 0; i--) {
         const inp = inputs[i] as HTMLInputElement;
         if (inp.placeholder.startsWith('e.g.')) {
@@ -1725,7 +1725,7 @@ export async function setOrgDomainViaUI(
       `setOrgDomainViaUI: edit-mode TextField for "${defaultDomain}" never appeared`,
     );
   }
-  // The field's value is the platform default (e.g. "ibank.local.sentin8.dev").
+  // The field's value is the platform default (e.g. "ibank.${DOMAIN}").
   // Find the focused edit-mode <input> (which has the default value)
   // and atomically replace its value with the custom domain using the
   // native value setter so Flutter's TextEditingController listener fires.
@@ -2031,7 +2031,7 @@ export async function createEnvironmentViaUI(
 /** Set the auth domain for an env (toggles the hostname on Auth8 settings).
  *
  * With the subdomain-only UI, the authDomain parameter is parsed to extract
- * just the subdomain prefix (e.g. "auth" from "https://auth.ibank.local").
+ * just the subdomain prefix (e.g. "auth" from "https://auth.ibank.${DOMAIN}").
  * The org domain suffix is fixed and shown in the UI.
  */
 export async function setAuthDomainViaUI(page: Page, orgID: string, envID: string, authDomain: string): Promise<void> {
@@ -2042,7 +2042,7 @@ export async function setAuthDomainViaUI(page: Page, orgID: string, envID: strin
   await waitForFlutterSemantics(page, 2_000);
   await waitForFlutterText(page, 'Auth Domain', 2_000);
   // Extract the subdomain prefix from the full auth domain.
-  // e.g. "https://auth.ibank.local" → "auth"
+  // e.g. "https://auth.ibank.${DOMAIN}" → "auth"
   const hostname = authDomain.replace(/^https?:\/\//, '').split('/')[0];
   const prefix = hostname.split('.')[0];
   await typeFlutterField(page, 'Subdomain', prefix);
